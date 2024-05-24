@@ -97,11 +97,12 @@ interface SearchWithDropzoneProps {
   onFileChange?: (files: FileList | null) => void;
 }
 
-export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchWithDropzoneProps) => {
+export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchProps) => {
   const setResults = useSearchStore((state) => state.setResults);
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [taskId, setTaskId] = useState<number | null>(null);
 
   const form = useForm<z.infer<typeof searchSchema>>({
     resolver: zodResolver(searchSchema),
@@ -114,17 +115,14 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchW
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
-      console.log("Paste event detected");
       const items = event.clipboardData?.items;
       let urlFound = false;
 
       if (items) {
         for (let i = 0; i < items.length; i++) {
           if (items[i].type.startsWith("image")) {
-            console.log("Image found in clipboard");
             const blob = items[i].getAsFile();
             if (blob) {
-              console.log("Blob obtained from clipboard", blob);
               setFile(blob);
               handleFileChange(blob);
               return;
@@ -132,7 +130,6 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchW
           } else if (items[i].type === "text/plain") {
             items[i].getAsString((text) => {
               if (isValidUrl(text)) {
-                console.log("URL found in clipboard", text);
                 form.setValue("searchFound", text);
                 urlFound = true;
               }
@@ -164,7 +161,6 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchW
 
   const handleFileChange = (file: File | null) => {
     if (file) {
-      console.log("File set in state", file);
       setFile(file);
       form.setValue("searchFound", "Image Added");
       const reader = new FileReader();
@@ -178,45 +174,57 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchW
     }
   };
 
+  const pollTaskStatus = async (taskId: number) => {
+    try {
+      const response = await fetch(`/api/taskStatus?id=${taskId}`);
+      if (!response.ok) throw new Error("Failed to fetch task status");
+
+      const data = await response.json();
+      if (data.status === "complete") {
+        setResults(data.result);
+        setIsLoading(false);
+        router.push(`/search`);
+
+
+        
+      } else {
+        setTimeout(() => pollTaskStatus(taskId), 3000);
+      }
+    } catch (error) {
+      console.error("Polling failed:", error);
+      setIsLoading(false);
+    }
+  };
+
   async function onSubmit(values: z.infer<typeof searchSchema>) {
     try {
+      setIsLoading(true);
+      let response;
       if (file) {
-        setIsLoading(true);
         const formData = new FormData();
         formData.append("file", file);
 
-        const response = await fetch("/api/uploadThing", {
+        response = await fetch("/api/uploadThing", {
           method: "POST",
           body: formData,
         });
-
-        if (!response.ok) throw new Error("Status code: " + response.status);
-        const data = await response.json();
-
-        setResults(data);
-        form.reset();
-        router.push(`/search`);
-        
       } else if (values.searchFound.trim() !== "") {
-        setIsLoading(true);
-
-        const response = await fetch('/api/getSearchResult', {
-          method: 'POST',
-          body: JSON.stringify({ text: values }),
+        response = await fetch("/api/getSearchResult", {
+          method: "POST",
+          body: JSON.stringify({ text: values.searchFound }),
         });
-
-        if (!response.ok) throw new Error("Status code: " + response.status);
-        const data = await response.json();
-
-        setResults(data);
-        form.reset();
-        router.push(`/search`);
       } else {
         console.log("No file uploaded and no search query provided");
+        setIsLoading(false);
+        return;
       }
+
+      if (!response.ok) throw new Error("Status code: " + response.status);
+      const data = await response.json();
+      setTaskId(data.task_id);
+      pollTaskStatus(data.task_id);
     } catch (error) {
       console.error("Search failed:", error);
-    } finally {
       setIsLoading(false);
     }
   }
@@ -263,5 +271,6 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchW
     </Form>
   );
 };
+
 
 export default SearchWithDropzone;
