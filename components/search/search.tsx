@@ -180,7 +180,13 @@ export const SearchWithDropzone = ({
 
   const pollTaskStatus = async (taskId: number) => {
     try {
-      const response = await fetch(`/api/getSearchResult/${taskId}`);
+      const response = await fetch(`/api/getSearchResult/${taskId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+      });
 
       if (!response.ok) throw new Error("Failed to fetch task status");
 
