@@ -41,6 +41,7 @@ const Dropzone: React.FC<DropzoneProps> = ({ onFileChange, preview }) => {
     return () => {
       document.removeEventListener("paste", handlePaste);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle drag-and-drop event to allow dropping images

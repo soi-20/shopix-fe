@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { Poppins } from "next/font/google";
-import Navbar from "@/components/navbar/navbar";
 
 import { ThemeProvider } from "next-themes";
-import { ThemeToggle } from "@/components/theme-toggle/theme-toggle";
 
 const poppins = Poppins({
   weight: ["400", "700"], // Specify the weights you need
