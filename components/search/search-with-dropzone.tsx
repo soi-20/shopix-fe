@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, isValidUrl } from "@/lib/utils";
 import { Form, FormField, FormMessage } from "../ui/form";
 import Dropzone from "../dropzone/dropzone";
 import { Input } from "../ui/input";
@@ -73,7 +73,7 @@ export const SearchWithDropzone = ({
 
       const data = await response.json();
 
-      console.log("POLLING=", data);
+      console.log("Polling=== ", data);
       if (data.status === "complete") {
         setResults(data.result.Results);
         setIsLoading(false);

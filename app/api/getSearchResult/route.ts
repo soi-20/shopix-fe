@@ -4,15 +4,16 @@ import { searchSchema } from "@/lib/validation";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const result = searchSchema.safeParse(body.text);
-    console.log(result, body);
+
+    const result = searchSchema.safeParse(body);
+
     if (!result.success) {
       console.error(result.error);
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const searchFound = result.data;
-    console.log(JSON.stringify(searchFound));
+    const searchFound = result.data.searchFound;
+
     const response = await fetch(
       "https://experiments-testing.azurewebsites.net/search",
       {
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
         },
         cache: "no-store",
-        body: JSON.stringify(searchFound),
+        body: JSON.stringify({ searchFound }),
       }
     );
 
@@ -30,7 +31,6 @@ export async function POST(req: Request) {
     }
 
     const data = await response.json();
-    console.log(data);
 
     return NextResponse.json(data);
   } catch (error) {
