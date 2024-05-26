@@ -17,6 +17,7 @@ export async function GET(
           "Content-Type": "application/json",
           "Cache-Control": "no-cache",
         },
+        cache: "no-store",
       }
     );
 
