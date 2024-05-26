@@ -97,7 +97,11 @@ interface SearchWithDropzoneProps {
   onFileChange?: (files: FileList | null) => void;
 }
 
-export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchProps) => {
+export const SearchWithDropzone = ({
+  placeholder,
+  className,
+  ...props
+}: SearchProps) => {
   const setResults = useSearchStore((state) => state.setResults);
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -176,17 +180,18 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchP
 
   const pollTaskStatus = async (taskId: number) => {
     try {
-      const response = await fetch(`/api/taskStatus?id=${taskId}`);
+      const response = await fetch(`/api/getSearchResult/${taskId}`);
+
       if (!response.ok) throw new Error("Failed to fetch task status");
 
       const data = await response.json();
+
+      console.log(data, "response");
+
       if (data.status === "complete") {
-        setResults(data.result);
+        setResults(data.result.Results);
         setIsLoading(false);
         router.push(`/search`);
-
-
-        
       } else {
         setTimeout(() => pollTaskStatus(taskId), 3000);
       }
@@ -231,16 +236,19 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchP
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={cn("flex flex-col items-center gap-4 mx-6", className)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("flex flex-col items-center gap-4 mx-6", className)}
+      >
         <FormField
           control={form.control}
           name="searchFound"
           render={({ field }) => (
             <>
               <div className="w-full sm:w-[518px] mx-auto border-4 border-border rounded-2xl overflow-hidden">
-                <Dropzone 
-                  onFileChange={(files) => handleFileChange(files?.[0] || null)} 
-                  preview={preview} 
+                <Dropzone
+                  onFileChange={(files) => handleFileChange(files?.[0] || null)}
+                  preview={preview}
                 />
               </div>
 
@@ -271,6 +279,5 @@ export const SearchWithDropzone = ({ placeholder, className, ...props }: SearchP
     </Form>
   );
 };
-
 
 export default SearchWithDropzone;
