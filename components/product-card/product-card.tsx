@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "../ui/card";
+import { Card } from "../ui/card";
 import Image from "next/image";
 import ShareIcon from "../icons/share-icon";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <Card
       className={cn(
-        "rounded-xl bg-secondary shadow-lg hover:shadow-xl",
+        "rounded-xl bg-secondary shadow-lg hover:shadow-xl overflow-hidden flex flex-col",
         className
       )}
     >
@@ -51,22 +51,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </div>
 
-      <div className="p-2 mt-1 bg-secondary">
-        <div className="p-2">
+      <div className="p-2 mt-1 bg-secondary flex flex-col flex-grow justify-between">
+        <div className="flex-grow p-2">
           <div className="flex items-center">
-            <h5 className="text-lg font-semibold tracking-tight text-primary/90">
+            <h5 className="text-lg font-semibold tracking-tight text-primary/90 line-clamp-2">
               {cardData.title}
             </h5>
           </div>
+        </div>
 
-          <div className="mt-3 flex items-end justify-between">
+        <div className="p-2 mt-auto">
+          <div className="flex items-center justify-between mb-2">
             <p>
               <span className="text-lg font-bold text-primary/90">
                 {cardData.price}
               </span>
             </p>
 
-            <div className="flex items-center my-2 gap-2">
+            <div className="flex items-center gap-2">
               <Image
                 width={100}
                 height={100}
@@ -80,7 +82,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           <Link href={cardData.link} target="_blank">
-            <Button className="mt-4 w-full ">Buy Now</Button>
+            <Button className="w-full">Buy Now</Button>
           </Link>
         </div>
       </div>
