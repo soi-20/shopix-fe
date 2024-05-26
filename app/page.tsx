@@ -1,8 +1,7 @@
 "use client";
 
-import Dropzone from "@/components/dropzone/dropzone";
-import { SearchWithDropzone } from "@/components/search/search";
-import React, { useState } from "react";
+import React from "react";
+import SearchWithDropzone from "@/components/search/search-with-dropzone";
 
 const HomeVariantPage = () => {
   return (
