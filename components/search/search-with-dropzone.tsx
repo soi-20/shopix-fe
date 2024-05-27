@@ -103,12 +103,21 @@ export const SearchWithDropzone = ({
 
       let searchQuery = values.searchFound;
 
+      console.log(file);
+
       if (file) {
         const formData = new FormData();
         formData.append("file", file);
-        const uploadedInputImage = await uploadFiles(formData);
-        console.log(uploadedInputImage);
-        searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
+        const response = await fetch("/api/uploadThing", {
+          method: "POST",
+          body: formData,
+        });
+        if (!response.ok) throw new Error("Status code: " + response.status);
+        const data = await response.json();
+
+        console.log(data);
+
+        searchQuery = data?.[0].data?.url || searchQuery;
       }
 
       const response = await fetch("/api/getSearchResult", {
