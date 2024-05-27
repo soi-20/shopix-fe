@@ -143,6 +143,7 @@ export const SearchWithDropzone = ({
           name="searchFound"
           render={({ field }) => (
             <>
+
               <div className="w-full sm:w-[518px] mx-auto border-4 border-border rounded-2xl overflow-hidden">
                 <Dropzone onFileChange={handleFileChange} preview={preview} />
               </div>
@@ -163,7 +164,11 @@ export const SearchWithDropzone = ({
 
               <Button
                 type="submit"
-                className="text-gray-700 rounded-full h-14 w-36 text-xl bg-gray-200 hover:bg-gray-200/90"
+                className={cn(
+                  "text-gray-700 rounded-full h-14 w-36 text-xl bg-gray-200 hover:bg-gray-200/90",
+                  { "cursor-not-allowed opacity-50": isLoading }
+                )}
+                disabled={isLoading}
               >
                 {isLoading ? (
                   <Loader className="h-5 w-5 animate-spin" />
