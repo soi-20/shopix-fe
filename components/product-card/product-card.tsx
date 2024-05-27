@@ -16,6 +16,7 @@ interface ProductCardProps {
     price: string; // Price as a string with currency symbol
     logo: string; // Base64 encoded logo
     link: string;
+    source: string;
   };
 }
 
@@ -31,58 +32,51 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <Card
       className={cn(
-        "rounded-xl bg-secondary shadow-lg hover:shadow-xl overflow-hidden flex flex-col",
+        "rounded-xl  min-h-80 shadow-lg hover:shadow-xl overflow-hidden flex flex-col",
         className
       )}
     >
-      <div className="relative bg-primary-foreground flex items-end overflow-hidden rounded-xl">
-        <Image
-          width={100}
-          height={100}
-          src={cardData.image}
-          alt="product image"
-          className="p-8 rounded-t-lg w-full h-52 object-contain"
-        />
-        <div className="absolute bottom-1 left-2 inline-flex items-center rounded-lg border bg-background p-1 shadow">
-          <StarIcon width={12} height={12} className="text-yellow-400" />
-          <span className="text-slate-400 ml-1 text-xs">
-            {rating.toFixed(1)}
-          </span>
+      <div className="relative cursor-auto rounded-xl bg-gray-100 dark:bg-secondary/30 flex items-center justify-center overflow-hidden rounded-t-xl">
+        <div className="p-4 pb-3">
+          <Image
+            width={200}
+            height={200}
+            src={cardData.image}
+            alt="product image"
+            className="w-40 h-48 mb-4 object-contain rounded-2xl border-2"
+          />
+          <div className="flex items-center rounded-md bg-gray-200 dark:bg-secondary justify-center overflow-hidden w-40 whitespace-nowrap"><p className="font-semibold overflow-hidden">{cardData.source}</p></div>
+        </div>
+        {cardData.rating === "NA" ? "" : (
+          <div className="absolute bottom-2 left-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
+            <StarIcon width={12} height={12} className="text-yellow-400" />
+            <span className="text-primary ml-1 text-sm font-medium">
+              {rating.toFixed(1)}
+            </span>
+          </div>
+        )}
+
+        <div className="absolute bottom-2 right-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
+          <Image
+            width={100}
+            height={100}
+            src={cardData.logo}
+            alt="source website logo"
+            className="w-5 h-5"
+            />
         </div>
       </div>
 
-      <div className="p-2 mt-1 bg-secondary flex flex-col flex-grow justify-between">
-        <div className="flex-grow p-2">
-          <div className="flex items-center">
-            <h5 className="text-lg font-semibold tracking-tight text-primary/90 line-clamp-2">
-              {cardData.title}
-            </h5>
-          </div>
-        </div>
-
-        <div className="p-2 mt-auto">
-          <div className="flex items-center justify-between mb-2">
-            <p>
-              <span className="text-lg font-bold text-primary/90">
-                {cardData.price}
-              </span>
-            </p>
-
-            <div className="flex items-center gap-2">
-              <Image
-                width={100}
-                height={100}
-                src={cardData.logo}
-                alt="source website logo"
-                className="w-5 h-5"
-              />
-
-              <ShareIcon className="text-primary" />
-            </div>
-          </div>
-
-          <Link href={cardData.link} target="_blank">
-            <Button className="w-full">Buy Now</Button>
+      <div className="p-4 cursor-auto flex flex-col flex-grow justify-between">
+        <h5 className="text-lg text-gray-600 dark:text-gray-300 font-semibold mb-4 line-clamp-2">
+          {cardData.title}
+        </h5>
+        <div className="flex flex-row items-center justify-between w-full">
+              {cardData.price === 'NA' ? "" : <div className="flex items-center justify-start font-bold w-full text-xl overflow-hidden whitespace-nowrap"><p className="mr-4 overflow-hidden">{cardData.price}</p></div>}
+          <Link href={cardData.link} target="_blank" className="w-full flex justify-end">
+            <Button className="w-full text-lg h-9 flex items-center justify-center">
+              Buy Now
+            </Button>
           </Link>
         </div>
       </div>
