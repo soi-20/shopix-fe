@@ -9,7 +9,9 @@ const utapi = new UTApi();
  */
 export async function uploadFiles(fd: FormData) {
   const files = fd.getAll("file") as File[];
+  console.log("got the file", files);
   const uploadedFiles = await utapi.uploadFiles(files);
+  console.log("received data", uploadFiles);
   return uploadedFiles;
 }
 
