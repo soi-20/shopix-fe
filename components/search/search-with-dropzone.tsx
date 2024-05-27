@@ -103,6 +103,8 @@ export const SearchWithDropzone = ({
 
       let searchQuery = values.searchFound;
 
+      console.log(file);
+
       if (file) {
         const formData = new FormData();
         formData.append("file", file);
