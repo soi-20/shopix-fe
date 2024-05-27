@@ -1,7 +1,6 @@
 "use server";
 
 import { UTApi } from "uploadthing/server";
-export const runtime = "nodejs";
 
 const utapi = new UTApi();
 
