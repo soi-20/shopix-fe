@@ -107,6 +107,7 @@ export const SearchWithDropzone = ({
         const formData = new FormData();
         formData.append("file", file);
         const uploadedInputImage = await uploadFiles(formData);
+        console.log(uploadedInputImage);
         searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
       }
 
