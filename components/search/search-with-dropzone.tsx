@@ -44,6 +44,43 @@ export const SearchWithDropzone = ({
   const router = useRouter();
 
   useEffect(() => {
+    const handlePaste = (event: ClipboardEvent) => {
+      console.log("Paste event detected");
+      const items = event.clipboardData?.items;
+      let urlFound = false;
+
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.startsWith("image")) {
+            console.log("Image found in clipboard");
+            const blob = items[i].getAsFile();
+            if (blob) {
+              console.log("Blob obtained from clipboard", blob);
+              setFile(blob);
+              handleFileChange(blob);
+              return;
+            }
+          } else if (items[i].type === "text/plain") {
+            items[i].getAsString((text) => {
+              if (text && (form.getValues().searchFound !== "Image Added")) {
+                console.log("URL/Text found in clipboard", text);
+                form.setValue("searchFound", text);
+                urlFound = true;
+              }
+            });
+          }
+        }
+      }
+    };
+
+    document.addEventListener("paste", handlePaste);
+
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, [form]);
+
+  useEffect(() => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => setPreview(reader.result as string);
@@ -77,6 +114,7 @@ export const SearchWithDropzone = ({
       if (data.status === "complete") {
         setResults(data.result.Results);
         setIsLoading(false);
+        form.reset();
         router.push(`/search`);
       } else {
         setTimeout(() => pollTaskStatus(taskId), 3000);
@@ -103,29 +141,46 @@ export const SearchWithDropzone = ({
 
       let searchQuery = values.searchFound;
 
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
+      if (file || isValidUrl(searchQuery)) {
+        if(file){
+          const formData = new FormData();
+          formData.append("file", file);
 
-        console.log(formData, file, "uploading image");
+          console.log(formData, file, "uploading image");
 
-        const uploadedInputImage = await uploadFiles(formData);
+          const uploadedInputImage = await uploadFiles(formData);
 
-        console.log(uploadedInputImage, "uploadedInputImage");
+          console.log(uploadedInputImage, "uploadedInputImage");
 
-        searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
+          searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
+        }
+        const response = await fetch("/api/getSearchResult", {
+          method: "POST",
+          body: JSON.stringify({ searchFound: searchQuery }),
+        });
+  
+        if (!response.ok) throw new Error("Status code: " + response.status);
+  
+        const data = await response.json();
+        setTaskId(data.task_id);
+        pollTaskStatus(data.task_id);
+      } else {
+        console.log(searchQuery);
+        const response = await fetch("/api/getTextSearchResult", {
+          method: "POST",
+          body: JSON.stringify({ searchFound: searchQuery }),
+        });
+  
+        if (!response.ok) throw new Error("Status code: " + response.status);
+  
+        const data = await response.json();
+        setResults(data.results);
+        setIsLoading(false);
+        form.reset();
+        console.log("new showing text input results on search page");
+        router.push(`/search`);
       }
-
-      const response = await fetch("/api/getSearchResult", {
-        method: "POST",
-        body: JSON.stringify({ searchFound: searchQuery }),
-      });
-
-      if (!response.ok) throw new Error("Status code: " + response.status);
-
-      const data = await response.json();
-      setTaskId(data.task_id);
-      pollTaskStatus(data.task_id);
+     
     } catch (error) {
       console.error("Search failed:", error);
       setIsLoading(false);

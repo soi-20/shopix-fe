@@ -10,10 +10,9 @@ import { StarIcon } from "../icons/star-icon";
 interface ProductCardProps {
   className?: string;
   cardData: {
-    delivery?:string;
     image: string;
     title: string;
-    rating?: string; // Rating as a string in the format "x/y"
+    rating: string; // Rating as a string in the format "x/y"
     price: string; // Price as a string with currency symbol
     logo: string; // Base64 encoded logo
     link: string;
@@ -27,32 +26,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
   ...props
 }) => {
   // Parse the rating
-  let ratingCheck;
-  if(!(cardData.rating === undefined)){
-    const [ratingValue, ratingMax] = cardData.rating.split("/").map(Number);
-    ratingCheck = (ratingValue / ratingMax) * 5;
-  } else {
-    ratingCheck = 0; 
-  }
-
-  let logoCheck;
-  if(!(cardData.logo === undefined)){
-    logoCheck = cardData.logo;
-  } else {
-    logoCheck = "no logo";
-  }
-
-  let deliveryCheck;
-  if(!(cardData.delivery === undefined)){
-    deliveryCheck = cardData.delivery;
-  } else {
-    deliveryCheck = "";
-  }
+  const [ratingValue, ratingMax] = cardData.rating.split("/").map(Number);
+  const rating = (ratingValue / ratingMax) * 5;
 
   return (
     <Card
       className={cn(
-        "rounded-xl relative min-h-80 shadow-lg hover:shadow-xl overflow-hidden flex flex-col",
+        "rounded-xl  min-h-80 shadow-lg hover:shadow-xl overflow-hidden flex flex-col",
         className
       )}
     >
@@ -68,18 +48,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex items-center rounded-md bg-gray-200 dark:bg-secondary justify-center overflow-hidden w-40 whitespace-nowrap"><p className="font-semibold overflow-hidden">{cardData.source}</p></div>
         </div>
         {cardData.rating === "NA" ? "" : (
-          ratingCheck === 0 ? "" : (
-            <div className="absolute bottom-2 left-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
+          <div className="absolute bottom-2 left-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
             <StarIcon width={12} height={12} className="text-yellow-400" />
             <span className="text-primary ml-1 text-sm font-medium">
-              {ratingCheck.toFixed(1)}
+              {rating.toFixed(1)}
             </span>
           </div>
-          )
         )}
 
-        {logoCheck == "no logo" ? "" : (
-          <div className="absolute bottom-2 right-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
+        <div className="absolute bottom-2 right-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
           <Image
             width={100}
             height={100}
@@ -88,14 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             className="w-5 h-5"
             />
         </div>
-        )}
       </div>
-
-      {/* {deliveryCheck === "" ? "" : (
-        <div className="absolute text-sm w-40 bottom-2 left-2 bg-secondary rounded-lg">
-          {deliveryCheck}
-        </div>
-      )} */}
 
       <div className="p-4 cursor-auto flex flex-col flex-grow justify-between">
         <h5 className="text-lg text-gray-600 dark:text-gray-300 font-semibold mb-4 line-clamp-2">
