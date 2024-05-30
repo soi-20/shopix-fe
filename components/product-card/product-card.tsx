@@ -58,14 +58,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <div className="relative cursor-auto rounded-xl bg-gray-100 dark:bg-secondary/30 flex items-center justify-center overflow-hidden rounded-t-xl">
         <div className="p-4 pb-3">
-          <img
-            width={100}
-            height={100}
-            src={cardData.logo}
-            alt="source website logo"
-            className="w-5 h-5"
+          <Image
+            width={200}
+            height={200}
+            src={cardData.image}
+            alt="product image"
+            className="w-40 h-48 mb-4 object-contain rounded-2xl border-2"
           />
-
           <div className="flex items-center rounded-md bg-gray-200 dark:bg-secondary justify-center overflow-hidden w-40 whitespace-nowrap"><p className="font-semibold overflow-hidden">{cardData.source}</p></div>
         </div>
         {cardData.rating === "NA" ? "" : (
