@@ -229,7 +229,7 @@ export const SearchWithIcon = ({
           control={form.control}
           name="searchFound"
           render={({ field }) => (
-            <div>
+            <div className="">
               <div className="flex flex-row sm:flex-row items-center gap-4">
                 <div
                 className={`flex flex-row border-4 dark: rounded-full ${

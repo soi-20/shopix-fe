@@ -339,39 +339,35 @@ export const SearchWithDropzone = ({
               </Button>
 
               {isOverlayOpen && file && (
-                <div className="fixed  inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="relative m-4 bg-white p-4 rounded-lg">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="relative m-4 bg-white p-4 rounded-lg max-w-full max-h-full overflow-auto w-11/12">
                     <ReactCrop
                       crop={crop}
                       onChange={(newCrop) => setCrop(newCrop)}
                       onComplete={(c) => {
                         console.log(c);
-                        if(c.height === 0 || c.width === 0){
+                        if (c.height === 0 || c.width === 0) {
                           setCompletedCrop({
-                            x:0,
-                            y:0,
-                            height:height,
-                            width:width,
-                            unit:'px'
+                            x: 0,
+                            y: 0,
+                            height: height,
+                            width: width,
+                            unit: 'px'
                           });
-                        } else{
+                        } else {
                           setCompletedCrop(c);
                         }
-                        
                       }}
                     >
-                      <img ref={refs} style={{transform:`scale(${scale}) rotate(${rotation}deg)`}} src={URL.createObjectURL(file)} onLoad={onImageLoad} alt="Crop Preview" />
+                      <img ref={refs} style={{ transform: `scale(${scale}) rotate(${rotation}deg)` }} src={URL.createObjectURL(file)} onLoad={onImageLoad} alt="Crop Preview" />
                     </ReactCrop>
-                    {/* <div className={'controls'}>
-                      <input type="range" min={0.1} max={3} step={0.05} value={scale} onChange={onZoom} />
-                      <span className={"rangeText"}>Zoom In/Out</span>
-                    </div> */}
                     <div className="flex flex-row gap-4 items-center justify-center mt-2">
-                      <Check onClick={setTheFile} className="w-12 h-7 text-white bg-black rounded-full"/>
+                      <Check onClick={setTheFile} className="w-12 h-7 text-white bg-black rounded-full" />
                     </div>
                   </div>
                 </div>
               )}
+
             </>
           )}
         />
