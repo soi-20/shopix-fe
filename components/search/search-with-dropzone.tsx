@@ -340,7 +340,7 @@ export const SearchWithDropzone = ({
 
               {isOverlayOpen && file && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="relative m-4 flex items-center gap-4 justify-center flex-col bg-white p-4 rounded-lg max-w-full max-h-full overflow-auto w-11/12 h-[50vh]">
+                  <div className="relative m-4 flex items-center gap-4 justify-center flex-col bg-white p-4 rounded-lg max-w-full max-h-full overflow-auto">
                     <ReactCrop
                       crop={crop}
                       onChange={(newCrop) => setCrop(newCrop)}
