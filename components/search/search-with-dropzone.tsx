@@ -340,7 +340,7 @@ export const SearchWithDropzone = ({
 
               {isOverlayOpen && file && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="relative m-4 bg-white p-4 rounded-lg max-w-full max-h-full overflow-auto w-11/12">
+                  <div className="relative m-4 flex items-center gap-4 justify-center flex-col bg-white p-4 rounded-lg max-w-full max-h-full overflow-auto w-11/12 h-[50vh]">
                     <ReactCrop
                       crop={crop}
                       onChange={(newCrop) => setCrop(newCrop)}
@@ -359,7 +359,7 @@ export const SearchWithDropzone = ({
                         }
                       }}
                     >
-                      <img ref={refs} style={{ transform: `scale(${scale}) rotate(${rotation}deg)` }} src={URL.createObjectURL(file)} onLoad={onImageLoad} alt="Crop Preview" />
+                      <img ref={refs} className="h-60" style={{ transform: `scale(${scale}) rotate(${rotation}deg)` }} src={URL.createObjectURL(file)} onLoad={onImageLoad} alt="Crop Preview" />
                     </ReactCrop>
                     <div className="flex flex-row gap-4 items-center justify-center mt-2">
                       <Check onClick={setTheFile} className="w-12 h-7 text-white bg-black rounded-full" />
