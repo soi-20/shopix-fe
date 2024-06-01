@@ -16,6 +16,9 @@ import { useTheme } from "next-themes";
 import { useSearchStore } from "@/store/searchResults";
 import { Loader } from "lucide-react";
 import { uploadFiles } from "@/actions/uploadThing";
+import LoadingScreen from "../loading-screen/loading";
+import SkeletonCard from "../product-card/product-card-skeleton";
+import DropzoneSearch from "../dropzone-search/dropzone";
 
 interface SearchProps {
   value?: string;
@@ -94,8 +97,14 @@ export const SearchWithIcon = ({
     }
   }, [file, form]);
 
-  const handleFileChange = (file: File | null) => {
-    setFile(file);
+  const handleFileChange = (file: File | null, reset?: boolean) => {
+    if (reset) {
+      setFile(null);
+      form.setValue("searchFound", "");
+    } else {
+      setFile(file);
+      form.setValue("searchFound", "Image Added");
+    }
   };
 
   const pollTaskStatus = async (taskId: number) => {
@@ -181,7 +190,6 @@ export const SearchWithIcon = ({
         const data = await response.json();
         setResults(data.results);
         setIsLoading(false);
-        form.reset();
         console.log("new showing text input results on search page");
         router.push(`/search`);
       }
@@ -196,6 +204,16 @@ export const SearchWithIcon = ({
   const mode = theme === "dark";
   const toggleTheme = () => {
     setTheme(mode ? "light" : "dark");
+  };
+
+  const [isClicked, setIsClicked] = useState(false);
+
+  const handleClick = () => {
+    setIsClicked(true);
+  };
+
+  const handleBlur = () => {
+    setIsClicked(false);
   };
 
   return (
@@ -213,12 +231,27 @@ export const SearchWithIcon = ({
           render={({ field }) => (
             <div>
               <div className="flex flex-row sm:flex-row items-center gap-4">
-                <Input
-                  className="w-full sm:w-[518px] placeholder:text-border dark:placeholder:text-stone-300 rounded-[46px] border-4"
-                  placeholder={placeholder}
-                  {...props}
-                  {...field}
-                />
+                <div
+                className={`flex flex-row border-4 dark: rounded-full ${
+                  isClicked ? 'border-blue-500' : 'border-gray-200 dark:border-zinc-800'
+                }`}
+                onClick={handleClick}
+                onBlur={handleBlur}>
+                  <Input
+                    className="w-full border-none h-12 sm:w-[518px] placeholder:text-border dark:placeholder:text-stone-300 rounded-full cursor-pointer"
+                    placeholder={placeholder}
+                    {...props}
+                    {...field}
+                    disabled={form.getValues().searchFound === "Image Added"}
+                  />
+                  <div className="flex items-center rounded-full p-0 pr-0 cursor-pointer hover:bg-transparent">
+                    <DropzoneSearch
+                      preview={preview}
+                      onFileChange={(file) => handleFileChange(file)}
+                      onReset={() => handleFileChange(null, true)}
+                    />
+                  </div>
+                </div>
                 <Button
                   type="submit"
                   className={cn(
