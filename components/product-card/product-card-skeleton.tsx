@@ -1,45 +1,29 @@
-import React from "react";
-import { Card, CardContent } from "../ui/card";
-import { cn } from "@/lib/utils";
-import { Skeleton } from "../skeleton/skeleton";
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Loader } from 'lucide-react';
 
-const ProductCardSkeleton: React.FC<{ className?: string }> = ({
-  className,
-}) => {
+const SkeletonCard: React.FC = () => {
   return (
-    <Card
-      className={cn("rounded-xl bg-white shadow-lg hover:shadow-xl", className)}
-    >
-      <div className="relative flex items-end overflow-hidden rounded-xl">
-        <Skeleton className="p-8 rounded-t-lg w-full h-52 bg-gray-200" />
-        <div className="absolute bottom-1 left-2 inline-flex items-center rounded-lg border bg-background p-1 shadow">
-          <Skeleton className="w-4 h-4 bg-yellow-400" />
-          <Skeleton className="ml-1 w-10 h-4 bg-gray-300" />
+    <>
+    <Card className="rounded-xl w-full relative min-h-80 shadow-lg overflow-hidden flex flex-col">
+      <div className="relative cursor-auto rounded-xl bg-gray-100 dark:bg-secondary/30 flex items-center justify-center overflow-hidden rounded-t-xl">
+        <div className="p-4 pb-3">
+          <Skeleton className="w-40 h-48 mb-4 rounded-2xl" />
+          <Skeleton className="w-40 h-6 rounded-md" />
         </div>
       </div>
 
-      <div className="p-2 mt-1 bg-gray-100">
-        <div className="p-2">
-          <div className="flex items-center">
-            <Skeleton className="w-3/4 h-6 bg-gray-300" />
-          </div>
-
-          <div className="mt-3 flex items-end justify-between">
-            <p>
-              <Skeleton className="w-1/4 h-6 bg-blue-400" />
-            </p>
-
-            <div className="flex items-center my-2 gap-2">
-              <Skeleton className="w-5 h-5 bg-gray-300" />
-              <Skeleton className="w-5 h-5 bg-gray-300" />
-            </div>
-          </div>
-
-          <Skeleton className="mt-4 w-full h-10 bg-blue-500" />
+      <div className="p-4 cursor-auto flex flex-col flex-grow justify-between">
+        <Skeleton className="h-5 w-full mb-4" />
+        <div className="flex flex-row items-center justify-between w-full">
+          <Skeleton className="w-24 h-6 mr-4" />
+          <Skeleton className="w-20 h-9 rounded-md" />
         </div>
       </div>
     </Card>
+    </>
   );
 };
 
-export default ProductCardSkeleton;
+export default SkeletonCard;

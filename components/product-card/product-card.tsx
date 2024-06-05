@@ -77,7 +77,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           )
         )}
-
         {logoCheck == "no logo" ? "" : (
           <div className="absolute bottom-2 right-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
           <Image
@@ -91,18 +90,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
       </div>
 
-      {/* {deliveryCheck === "" ? "" : (
-        <div className="absolute text-sm w-40 bottom-2 left-2 bg-secondary rounded-lg">
-          {deliveryCheck}
-        </div>
-      )} */}
-
       <div className="p-4 cursor-auto flex flex-col flex-grow justify-between">
         <h5 className="text-lg text-gray-600 dark:text-gray-300 font-semibold mb-4 line-clamp-2">
           {cardData.title}
         </h5>
         <div className="flex flex-row items-center justify-between w-full">
-              {cardData.price === 'NA' ? "" : <div className="flex items-center justify-start font-bold w-full text-xl overflow-hidden whitespace-nowrap"><p className="mr-4 overflow-hidden">{cardData.price}</p></div>}
+          {cardData.price === 'NA' ? "" : 
+          <div className="flex items-start flex-col mr-4 justify-start font-bold w-full text-xl overflow-hidden whitespace-nowrap">
+            <p className="text-md overflow-hidden">{cardData.price}</p>
+            <p className="text-sm text-gray-400 overflow-hidden">{cardData.delivery}</p>
+          </div>}
           <Link href={cardData.link} target="_blank" className="w-full flex justify-end">
             <Button className="w-full text-lg h-9 flex items-center justify-center">
               Buy Now
