@@ -198,6 +198,7 @@ export const SearchWithDropzone = ({
 
   const onSubmit = async (values: z.infer<typeof searchSchema>) => {
     setSubmitPressed(true);
+    router.push(`/search`);
     try {
       setIsLoading(true);
       setResults([]);
@@ -226,7 +227,6 @@ export const SearchWithDropzone = ({
 
           searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
         }
-        router.push(`/search`);
         const response = await fetch("/api/getSearchResult", {
           method: "POST",
           body: JSON.stringify({ searchFound: searchQuery }),
