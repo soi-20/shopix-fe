@@ -17,7 +17,7 @@ interface InstaCardProps {
     price: string; // Price as a string with currency symbol
     source_icon: string; // Base64 encoded logo
     link: string;
-    source: string;
+    source?: string;
   };
 }
 
