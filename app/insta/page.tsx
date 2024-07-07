@@ -14,7 +14,7 @@ const InstaPosts = () => {
     },
     {
       id: 1,
-      image: "https://m.media-amazon.com/images/I/612fr7j-88L._SY741_.jpg",
+      image: "https://m.media-amazon.com/images/I/51k4kM80q3L._SY606_.jpg",
     },
     {
       id: 2,
@@ -48,7 +48,15 @@ const InstaPosts = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
+      <Image
+        src="/logo.png"
+        alt="logo"
+        width={70}
+        height={70}
+        className="mx-auto mb-8 object-contain rounded-full"
+      />
+
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
         {results.map((card) => (
           <div
             key={card.id}
