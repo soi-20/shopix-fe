@@ -56,18 +56,20 @@ const InstaCard: React.FC<InstaCardProps> = ({
         className
       )}
     >
-      <div className="relative cursor-auto flex items-center justify-center overflow-hidden">
-        <div className="sm:w-auto h-96 w-auto">
-          <Image
-            width={200}
-            height={200}
-            src={cardData.thumbnail}
-            alt="product image"
-            className="object-contain absolute top-0 left-0 right-0 bottom-0 w-full h-full object-contain mx-auto"
-          />
-          {/* <div className="flex items-center rounded-md bg-gray-200 dark:bg-secondary justify-center overflow-hidden w-40 whitespace-nowrap">
+      <div className="relative cursor-auto flex items-center justify-center overflow-hidden bg-[#F5F4F2]">
+        <div className="bg-[#FCFAFA]" style={{ width: "90%", height: "90%" }}>
+          <div className="sm:w-auto h-96 w-auto">
+            <Image
+              width={200}
+              height={200}
+              src={cardData.thumbnail}
+              alt="product image"
+              className="object-contain absolute top-0 left-0 right-0 bottom-0 w-full h-full object-contain mx-auto p-6 pt-10 pb-10"
+            />
+            {/* <div className="flex items-center rounded-md bg-gray-200 dark:bg-secondary justify-center overflow-hidden w-40 whitespace-nowrap">
             <p className="font-semibold overflow-hidden">{cardData.source}</p>
-          </div> */}
+            </div> */}
+          </div>
         </div>
         {cardData.rating === "NA" ? (
           ""
@@ -103,16 +105,16 @@ const InstaCard: React.FC<InstaCardProps> = ({
         </div>
       )} */}
 
-      <div className="p-4 cursor-auto flex flex-col flex-grow justify-between">
-        <h5 className="text-lg text-gray-600 dark:text-gray-400 font-semibold line-clamp-2">
+      <div className="p-4 cursor-auto flex flex-col flex-grow justify-between bg-[#F5F4F2] pt-0">
+        <h5 className="text-sm text-[#6F6F6F] dark:text-gray-400 font-semibold line-clamp-2">
           {cardData.title}
         </h5>
         <div className="flex flex-row items-center justify-between w-full">
           {cardData.price === "NA" ? (
             ""
           ) : (
-            <div className="flex items-center justify-start font-bold w-full text-md overflow-hidden whitespace-nowrap">
-              <p className="mr-4 overflow-hidden text-[#4B4B4B]">
+            <div className="flex items-center justify-start font-semibold w-full text-lg overflow-hidden whitespace-nowrap">
+              <p className="mr-4 overflow-hidden text-[#000000]">
                 {cardData.price}
               </p>
             </div>
@@ -123,7 +125,7 @@ const InstaCard: React.FC<InstaCardProps> = ({
           target="_blank"
           className="w-full flex justify-center"
         >
-          <Button className="w-full text-md flex items-center justify-center mt-2 bg-[#6A6A6A] text-white rounded-xl hover:bg-[#4B4B4B]">
+          <Button className="w-full text-md flex items-center justify-center mt-1 bg-[#444444] text-white rounded-l hover:bg-[#333333]">
             Buy Now
           </Button>
         </Link>
