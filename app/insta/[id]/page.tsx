@@ -74,12 +74,12 @@ const Searches = () => {
         link: "https://stylishop.com/sa/en/product-dennis-lingo-solid-casual-shirt-with-button-placket-7006634220",
       },
       {
-        title: "Van Heusen White Slim Fit Cotton Shirt",
+        title: "Van Heusen White Slim Fit Shirt",
         thumbnail:
           "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTrHEsx9l_J_mJAqHnFCmtp5W-Ab_64f1kuSzJJVwq2hQQs_Ax-",
         source_icon:
           "https://encrypted-tbn1.gstatic.com/favicon-tbn?q=tbn:ANd9GcTzTKd6vOpthf_YakKljUYHZVndAOFGJkAQe0-GTN1GE_BXa3uwKYcOXXmK2mWW16aXGkqjKiwN8s6Gr_NpknFuxGT96zA7HWw2MKcNK66z6tqekgEc",
-        price: "1,789.00",
+        price: "INR 100,000",
         link: "https://www.tatacliq.com/van-heusen-white-slim-fit-cotton-shirt/p-mp000000008428707",
       },
       {
@@ -89,7 +89,7 @@ const Searches = () => {
           "https://encrypted-tbn1.gstatic.com/favicon-tbn?q=tbn:ANd9GcRILfQUakeHOSu5dggkcAVZJbGTnrIo5JZHHOEXQWwdf5i0EKvvQYH6cEKDmx9wLxk96e8RIaCcliCvNvGwIHrWTvDu0O2iEYc0AyVVYil21gFn_A",
         thumbnail:
           "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQzDBOilbigf5sbvdMJkj5vta2TzU7FKfxXXpjY_18n8HtkHxpb",
-        price: "₹1,789.00",
+        price: "INR 100,000",
       },
     ],
 
