@@ -10,6 +10,7 @@ type CardData = {
   source_icon: string;
   price: string;
   link: string;
+  source: string;
 };
 
 type Results = {
@@ -26,6 +27,7 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn0.gstatic.com/favicon-tbn?q=tbn:ANd9GcR2emfet7RmzmPRsHjYm_UPCTAgzmbvxRasG6I2u0I4LbQ54ZknecWGFOlBWs77JqzWT4yV05Z70DroaUwrYGlJKA1RUCO8YFzPxNBQf8kSXLfu",
         price: "₹1,789.00",
+        source: "Amazon",
         link: "https://www.amazon.in/Van-Heusen-Men-Shirt/dp/B0BCPVVLCV",
       },
       {
@@ -35,6 +37,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn1.gstatic.com/favicon-tbn?q=tbn:ANd9GcSVSgO1cREAcotL53kgY41YeEtpIzj_v89mZqm4xpWf9tiQeKqzzMvk4LCW8jxKSe1LaauexP12mxcbDe-aRQpgrbMEXDVL8rtxsJjRV8__7y9rVGPaMg",
         price: "1,789.00",
+        source: "Amazon",
+
         link: "https://www.goosebery.com/products/gbmnr-3005",
       },
       {
@@ -44,6 +48,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn3.gstatic.com/favicon-tbn?q=tbn:ANd9GcTZINa-Te7bv8MscB5b6FfK__Uu4XBkWQsis7wRqrWRsMISW0ldAmte6VNWHgquxAHZyLYCZZswiMTaqLML3WB19-_CfgDoKZ-dupPqPfoV6TgbXdaR",
         price: "1,789.00",
+        source: "Amazon",
+
         link: "https://www.flipkart.com/devin-fox-men-solid-casual-white-shirt/p/itm50a8c880dc94a?pid=SHTGKHZA5BJBDVYM&lid=LSTSHTGKHZA5BJBDVYM4A5I6V&marketplace=FLIPKART&store=clo%2Fash%2Faxc%2Fmmk%2Fkp7",
       },
       {
@@ -53,6 +59,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn3.gstatic.com/favicon-tbn?q=tbn:ANd9GcRYP9nXiBtEydtSJOfYS2P816QcX4ZVJfTK0lPLcd16En5x0VevcGpLONr3gmz_IEnsmeUcO3jcZ_9JXEQDm_KGvXHIEdYl6UFzEx6Yw308rvakYV2_9xNk1Q",
         price: "₹2,099.00",
+        source: "Amazon",
+
         link: "https://www.shoppersstop.com/arrow-mens-urban-slim-fit-printed-shirt/p-202092567/colorChange/202092567_WHITE",
       },
       {
@@ -62,6 +70,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn3.gstatic.com/favicon-tbn?q=tbn:ANd9GcTd3jYGszPpQhlQRf-AHW4koIeQoD85nubY7pzGnGiFyCWNxDSHE6hnC3zvJh0431GviARNRnCXC4e6GBUdum1grqgTJYXNEdn-bGG7o753t830zeP6Ag4Ai_3CeA",
         price: "1,789.00",
+        source: "Amazon",
+
         link: "https://vanheusenindia.abfrl.in/p/van-heusen-white-shirt-39563443.html",
       },
       {
@@ -71,6 +81,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn1.gstatic.com/favicon-tbn?q=tbn:ANd9GcQoPnP33u1jZH8WK201Opjohx-X8o2G7hOq8p-eXeTKfhwXQT4lt1PnnekHaOjMP8jHYNTT7oylMgDqxCHtvoMmYv0_n2bUfKSDTERjeYGzkEpr",
         price: "1,789.00",
+        source: "Amazon",
+
         link: "https://stylishop.com/sa/en/product-dennis-lingo-solid-casual-shirt-with-button-placket-7006634220",
       },
       {
@@ -80,6 +92,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn1.gstatic.com/favicon-tbn?q=tbn:ANd9GcTzTKd6vOpthf_YakKljUYHZVndAOFGJkAQe0-GTN1GE_BXa3uwKYcOXXmK2mWW16aXGkqjKiwN8s6Gr_NpknFuxGT96zA7HWw2MKcNK66z6tqekgEc",
         price: "INR 100,000",
+        source: "Amazon",
+
         link: "https://www.tatacliq.com/van-heusen-white-slim-fit-cotton-shirt/p-mp000000008428707",
       },
       {
@@ -90,6 +104,7 @@ const Searches = () => {
         thumbnail:
           "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQzDBOilbigf5sbvdMJkj5vta2TzU7FKfxXXpjY_18n8HtkHxpb",
         price: "INR 100,000",
+        source: "Amazon",
       },
     ],
 
@@ -101,6 +116,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn0.gstatic.com/favicon-tbn?q=tbn:ANd9GcR2emfet7RmzmPRsHjYm_UPCTAgzmbvxRasG6I2u0I4LbQ54ZknecWGFOlBWs77JqzWT4yV05Z70DroaUwrYGlJKA1RUCO8YFzPxNBQf8kSXLfu",
         price: "₹1,789.00",
+        source: "Amazon",
+
         link: "https://www.amazon.in/Van-Heusen-Men-Shirt/dp/B0BCPVVLCV",
       },
       {
@@ -110,6 +127,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn1.gstatic.com/favicon-tbn?q=tbn:ANd9GcSVSgO1cREAcotL53kgY41YeEtpIzj_v89mZqm4xpWf9tiQeKqzzMvk4LCW8jxKSe1LaauexP12mxcbDe-aRQpgrbMEXDVL8rtxsJjRV8__7y9rVGPaMg",
         price: "1,789.00",
+        source: "Amazon",
+
         link: "https://www.goosebery.com/products/gbmnr-3005",
       },
       {
@@ -119,6 +138,8 @@ const Searches = () => {
         source_icon:
           "https://encrypted-tbn3.gstatic.com/favicon-tbn?q=tbn:ANd9GcTZINa-Te7bv8MscB5b6FfK__Uu4XBkWQsis7wRqrWRsMISW0ldAmte6VNWHgquxAHZyLYCZZswiMTaqLML3WB19-_CfgDoKZ-dupPqPfoV6TgbXdaR",
         price: "1,789.00",
+        source: "Amazon",
+
         link: "https://www.flipkart.com/devin-fox-men-solid-casual-white-shirt/p/itm50a8c880dc94a?pid=SHTGKHZA5BJBDVYM&lid=LSTSHTGKHZA5BJBDVYM4A5I6V&marketplace=FLIPKART&store=clo%2Fash%2Faxc%2Fmmk%2Fkp7",
       },
     ],

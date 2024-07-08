@@ -56,19 +56,19 @@ const InstaCard: React.FC<InstaCardProps> = ({
         className
       )}
     >
-      <div className="relative cursor-auto flex items-center justify-center overflow-hidden bg-[#F5F4F2]">
-        <div className="bg-[#FCFAFA]" style={{ width: "90%", height: "90%" }}>
-          <div className="sm:w-auto h-96 w-auto">
+      <div className="relative cursor-auto flex items-center justify-center overflow-hidden bg-[#F5F4F2] rounded-sm">
+        <div
+          className="bg-[#FCFAFA] rounded-sm"
+          style={{ width: "90%", height: "90%" }}
+        >
+          <div className="sm:w-auto h-96 w-auto rounded-sm">
             <Image
               width={200}
               height={200}
               src={cardData.thumbnail}
               alt="product image"
-              className="object-contain absolute top-0 left-0 right-0 bottom-0 w-full h-full object-contain mx-auto p-6 pt-10 pb-10"
+              className="object-contain absolute top-0 left-0 right-0 bottom-0 w-full h-full p-6 pt-10 pb-10"
             />
-            {/* <div className="flex items-center rounded-md bg-gray-200 dark:bg-secondary justify-center overflow-hidden w-40 whitespace-nowrap">
-            <p className="font-semibold overflow-hidden">{cardData.source}</p>
-            </div> */}
           </div>
         </div>
         {cardData.rating === "NA" ? (
@@ -83,20 +83,6 @@ const InstaCard: React.FC<InstaCardProps> = ({
             </span>
           </div>
         )}
-
-        {logoCheck == "no logo" ? (
-          ""
-        ) : (
-          <div className="absolute top-2 right-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
-            <Image
-              width={150}
-              height={150}
-              src={cardData.source_icon}
-              alt="source website logo"
-              className="w-7 h-7"
-            />
-          </div>
-        )}
       </div>
 
       {/* {deliveryCheck === "" ? "" : (
@@ -109,6 +95,10 @@ const InstaCard: React.FC<InstaCardProps> = ({
         <h5 className="text-sm text-[#6F6F6F] dark:text-gray-400 font-semibold line-clamp-2">
           {cardData.title}
         </h5>
+
+        <p className="overflow-hidden text-[#939393] text-md font-medium">
+          {cardData.source}
+        </p>
         <div className="flex flex-row items-center justify-between w-full">
           {cardData.price === "NA" ? (
             ""
@@ -125,10 +115,25 @@ const InstaCard: React.FC<InstaCardProps> = ({
           target="_blank"
           className="w-full flex justify-center"
         >
-          <Button className="w-full text-md flex items-center justify-center mt-1 bg-[#444444] text-white rounded-l hover:bg-[#333333]">
-            Buy Now
+          <Button className="w-full text-md flex items-center justify-center mt-1 bg-[#444444] text-white rounded hover:bg-[#333333] font-normal">
+            Buy now on{" "}
+            <span className="font-semibold pl-1"> {cardData.source}</span>
           </Button>
         </Link>
+
+        {logoCheck == "no logo" ? (
+          ""
+        ) : (
+          <div className="absolute bottom-16 right-5 flex items-center bg-white dark:bg-secondary p-1 rounded">
+            <Image
+              width={150}
+              height={150}
+              src={cardData.source_icon}
+              alt="source website logo"
+              className="w-5 h-5"
+            />
+          </div>
+        )}
       </div>
     </Card>
   );
