@@ -69,7 +69,7 @@ const InstaPosts = () => {
           <div
             key={card.id}
             onClick={() => handleCardClick(card.id)}
-            className="block w-full cursor-pointer transform transition-transform duration-300 hover:scale-105"
+            className="block w-full cursor-pointer transform transition-transform duration-300 hover:scale-105 mb-2"
             style={{
               textDecoration: "none",
               color: "inherit",
@@ -80,8 +80,11 @@ const InstaPosts = () => {
               height={200}
               src={card.image}
               alt="product image"
-              className="w-full h-auto mb-4 object-contain rounded-2xl border-2"
+              className="w-full h-auto mb-2 object-contain rounded-2xl border-2"
             />
+            <p className="flex items-center justify-center font-semibold text-[#6F6F6F] text-sm">
+              Floral Linen Maxi dress
+            </p>
           </div>
         ))}
       </div>
