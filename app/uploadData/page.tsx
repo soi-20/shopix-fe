@@ -2,6 +2,7 @@
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import Image from "next/image";
+import pool from "@/lib/db";
 
 interface ImageData {
   image: File | null;
@@ -12,6 +13,11 @@ interface ImageData {
   preview: string;
 }
 
+interface Post {
+  title: string;
+  image: string;
+}
+
 const UploadMultiple: React.FC = () => {
   const [images, setImages] = useState<ImageData[]>([
     { image: null, title: "", price: "", source: "", link: "", preview: "" },
@@ -19,6 +25,11 @@ const UploadMultiple: React.FC = () => {
 
   const [imagePost, setImagePost] = useState<File | null>(null);
   const [postImagePreview, setPostImagePreview] = useState<string>("");
+  const [postTitle, setPostTitle] = useState<string>("");
+
+  const handlePostTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPostTitle(e.target.value);
+  };
 
   const handlePostImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
@@ -31,6 +42,51 @@ const UploadMultiple: React.FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log(images);
+
+    const formData = new FormData();
+    if (imagePost) {
+      formData.append("image", imagePost);
+    }
+
+    images.forEach((img, index) => {
+      if (img.image) {
+        formData.append(`image`, img.image);
+      }
+    });
+
+    fetch("/api/getImageURLs", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        let post: Post = {
+          title: postTitle,
+          image: data.results[0],
+        };
+
+        let postData = images.map((img, index) => {
+          return {
+            title: img.title,
+            price: img.price || null,
+            source: img.source || null,
+            link: img.link || null,
+            image: data.results[index + 1],
+          };
+        });
+
+        fetch("/api/uploadPosts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ post, postData }),
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data))
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleImage = (index: number, file: File) => {
@@ -99,6 +155,7 @@ const UploadMultiple: React.FC = () => {
           type="text"
           placeholder="Image Title"
           className="p-3 border rounded-sm text-md border-gray-300"
+          onChange={handlePostTitleChange}
         />
 
         <label className="text-xl font-semibold pt-5">Screen 2</label>
