@@ -46,7 +46,6 @@ const Searches = () => {
           (item: { id: number; postdata: string; posts: string }) => {
             try {
               let postData = JSON.parse(item.postdata);
-              console.log("postData", postData);
               return {
                 id: item.id,
                 title: postData[0].title,
@@ -71,7 +70,6 @@ const Searches = () => {
           }
         });
 
-        console.log(results);
         setResults(results);
       } catch (error) {
         console.error("Error fetching data", error);

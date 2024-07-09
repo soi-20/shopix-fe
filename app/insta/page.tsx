@@ -22,7 +22,6 @@ const InstaPosts = () => {
         });
         let data = await response.json();
 
-        // there are 3 columns, we need to parse out the 2nd column
         const parsedData = data.map((item: any) => {
           let posts = JSON.parse(item.posts);
           return {
