@@ -11,11 +11,11 @@ interface InstaCardProps {
   className?: string;
   cardData: {
     delivery?: string;
-    thumbnail: string;
+    image: string;
     title: string;
     rating?: string; // Rating as a string in the format "x/y"
     price: string; // Price as a string with currency symbol
-    source_icon: string; // Base64 encoded logo
+    source_icon?: string; // Base64 encoded logo
     link: string;
     source?: string;
   };
@@ -65,7 +65,7 @@ const InstaCard: React.FC<InstaCardProps> = ({
             <Image
               width={200}
               height={200}
-              src={cardData.thumbnail}
+              src={cardData.image}
               alt="product image"
               className="object-contain absolute top-0 left-0 right-0 bottom-0 w-full h-full p-6 pt-10 pb-10"
             />
@@ -121,7 +121,7 @@ const InstaCard: React.FC<InstaCardProps> = ({
           </Button>
         </Link>
 
-        {logoCheck == "no logo" ? (
+        {/* {logoCheck == "no logo" ? (
           ""
         ) : (
           <div className="absolute bottom-16 right-5 flex items-center bg-white dark:bg-secondary p-1 rounded">
@@ -133,7 +133,7 @@ const InstaCard: React.FC<InstaCardProps> = ({
               className="w-5 h-5"
             />
           </div>
-        )}
+        )} */}
       </div>
     </Card>
   );
