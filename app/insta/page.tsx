@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import RotateLoader from "react-spinners/RotateLoader";
+import Lottie from "lottie-react";
+import animationData from "@/public/animation.json";
 
 interface CardProps {
   id: number;
@@ -19,10 +20,15 @@ const InstaPosts = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/uploadPosts", {
+        const fetchPromise = fetch("/api/uploadPosts", {
           method: "GET",
-        });
-        let data = await response.json();
+        }).then((response) => response.json());
+
+        const delayPromise = new Promise((resolve) =>
+          setTimeout(resolve, 2000)
+        );
+
+        const [data] = await Promise.all([fetchPromise, delayPromise]);
 
         const parsedData = data.map((item: any) => {
           let posts = JSON.parse(item.posts);
@@ -34,9 +40,9 @@ const InstaPosts = () => {
         });
 
         setResults(parsedData);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -60,7 +66,11 @@ const InstaPosts = () => {
 
       {loading ? (
         <div className="flex justify-center items-center h-64 mt-20">
-          <RotateLoader size={18} color={"#6165C6"} loading={loading} />
+          <Lottie
+            className="rounded-full"
+            animationData={animationData}
+            loop={true}
+          />
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
