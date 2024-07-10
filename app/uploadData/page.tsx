@@ -83,7 +83,9 @@ const UploadMultiple: React.FC = () => {
           body: JSON.stringify({ post, postData }),
         })
           .then((res) => res.json())
-          .then((data) => console.log(data))
+          .then((data) => {
+            alert("Data uploaded successfully!");
+          })
           .catch((err) => console.error(err));
       })
       .catch((err) => console.error(err));
