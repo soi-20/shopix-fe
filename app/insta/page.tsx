@@ -8,7 +8,7 @@ import RotateLoader from "react-spinners/RotateLoader";
 interface CardProps {
   id: number;
   image: string;
-  text: string;
+  title: string;
 }
 
 const InstaPosts = () => {
@@ -29,7 +29,7 @@ const InstaPosts = () => {
           return {
             id: item.id,
             image: posts.image,
-            text: posts.text,
+            text: posts.title,
           };
         });
 
