@@ -38,20 +38,21 @@ const Searches = () => {
           method: "GET",
         });
         let data = await response.json();
-        console.log("data", data);
 
-        const parsedData = data.map(
+        const parsedData = data.flatMap(
           (item: { id: number; postdata: string; posts: string }) => {
             try {
               let postData = JSON.parse(item.postdata);
-              return {
-                id: item.id,
-                title: postData[0].title,
-                image: postData[0].image,
-                price: postData[0].price,
-                link: postData[0].link,
-                source: postData[0].source,
-              };
+              return postData.map((post: PostDataProps) => {
+                return {
+                  id: item.id,
+                  title: post.title,
+                  image: post.image,
+                  price: post.price,
+                  link: post.link,
+                  source: post.source,
+                };
+              });
             } catch (error) {
               console.error("Error parsing data", error);
             }
