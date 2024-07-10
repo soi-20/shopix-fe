@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import InstaCard from "@/components/product-card/insta-card";
+import SkeletonInstaCard from "@/components/skeleton/skeletonInstaCard";
 
 type CardData = {
   title: string;
@@ -23,14 +24,12 @@ type PostDataProps = {
 };
 
 type Results = {
-  [key: number]: CardData[]; // Assumes that the keys are numbers
+  [key: number]: CardData[];
 };
 
 const Searches = () => {
-  // fetch these results from the api now
   const [results, setResults] = useState<Results>({});
-
-  // we will need the 3rd column and we will need to create this 0 1 mapping ourselves
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +40,6 @@ const Searches = () => {
         let data = await response.json();
         console.log("data", data);
 
-        // there are 3 columns, we need to parse out the 2nd column
         const parsedData = data.map(
           (item: { id: number; postdata: string; posts: string }) => {
             try {
@@ -60,7 +58,6 @@ const Searches = () => {
           }
         );
 
-        // we will need to create a 0 1 mapping
         let results: Results = {};
         parsedData.forEach((item: PostDataProps) => {
           if (results[item.id]) {
@@ -71,8 +68,10 @@ const Searches = () => {
         });
 
         setResults(results);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);
+        setLoading(false);
       }
     };
 
@@ -85,15 +84,23 @@ const Searches = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
-        {resultsCurrent.map((card, index) => (
-          <InstaCard
-            key={index}
-            className="w-full cursor-pointer"
-            cardData={card}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
+          {[...Array(6)].map((_, index) => (
+            <SkeletonInstaCard key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
+          {resultsCurrent.map((card, index) => (
+            <InstaCard
+              key={index}
+              className="w-full cursor-pointer"
+              cardData={card}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
