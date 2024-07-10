@@ -29,7 +29,7 @@ const InstaPosts = () => {
           return {
             id: item.id,
             image: posts.image,
-            text: posts.title,
+            title: posts.title,
           };
         });
 
@@ -82,7 +82,7 @@ const InstaPosts = () => {
                 className="w-full h-auto mb-2 object-contain rounded-2xl border-2"
               />
               <p className="flex items-center justify-center font-semibold text-[#6F6F6F] text-sm">
-                {card.text}
+                {card.title}
               </p>
             </div>
           ))}
