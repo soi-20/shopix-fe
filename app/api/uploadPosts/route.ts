@@ -28,7 +28,7 @@ export async function POST(req: Request, res: NextResponse) {
 // Fetch all data
 export async function GET(req: Request, res: NextResponse) {
   try {
-    const result = await pool.query("SELECT * FROM Posts");
+    const result = await pool.query("SELECT * FROM Posts ORDER BY id DESC");
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error("Error fetching data", error);
