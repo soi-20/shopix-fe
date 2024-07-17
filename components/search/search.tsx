@@ -39,7 +39,6 @@ export const SearchWithIcon = ({
     },
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [taskId, setTaskId] = useState<number | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const setResults = useSearchStore((state) => state.setResults);
@@ -64,7 +63,7 @@ export const SearchWithIcon = ({
             }
           } else if (items[i].type === "text/plain") {
             items[i].getAsString((text) => {
-              if (text && (form.getValues().searchFound !== "Image Added")) {
+              if (text && form.getValues().searchFound !== "Image Added") {
                 console.log("URL/Text found in clipboard", text);
                 form.setValue("searchFound", text);
                 urlFound = true;
@@ -97,39 +96,9 @@ export const SearchWithIcon = ({
   const handleFileChange = (file: File | null) => {
     setFile(file);
   };
-
-  const pollTaskStatus = async (taskId: number) => {
-    try {
-      const response = await fetch(`/api/getSearchResult/${taskId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-        },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch task status");
-
-      const data = await response.json();
-
-      console.log("Polling=== ", data);
-      if (data.status === "complete") {
-        setResults(data.result.Results);
-        setIsLoading(false);
-        form.reset();
-        router.push(`/search`);
-      } else {
-        setTimeout(() => pollTaskStatus(taskId), 3000);
-      }
-    } catch (error) {
-      console.error("Polling failed:", error);
-      setIsLoading(false);
-    }
-  };
-
   const onSubmit = async (values: z.infer<typeof searchSchema>) => {
     console.log("reached");
-    
+
     try {
       setIsLoading(true);
 
@@ -147,7 +116,7 @@ export const SearchWithIcon = ({
       console.log(searchQuery);
 
       if (file || isValidUrl(searchQuery)) {
-        if(file){
+        if (file) {
           const formData = new FormData();
           formData.append("file", file);
 
@@ -163,21 +132,24 @@ export const SearchWithIcon = ({
           method: "POST",
           body: JSON.stringify({ searchFound: searchQuery }),
         });
-  
+
         if (!response.ok) throw new Error("Status code: " + response.status);
-  
+
         const data = await response.json();
-        setTaskId(data.task_id);
-        pollTaskStatus(data.task_id);
+        setResults(data.results);
+        setIsLoading(false);
+        form.reset();
+        console.log("new showing image input results on search page");
+        router.push(`/search`);
       } else {
         console.log(searchQuery);
         const response = await fetch("/api/getTextSearchResult", {
           method: "POST",
           body: JSON.stringify({ searchFound: searchQuery }),
         });
-  
+
         if (!response.ok) throw new Error("Status code: " + response.status);
-  
+
         const data = await response.json();
         setResults(data.results);
         setIsLoading(false);
@@ -185,7 +157,6 @@ export const SearchWithIcon = ({
         console.log("new showing text input results on search page");
         router.push(`/search`);
       }
-     
     } catch (error) {
       console.error("Search failed:", error);
       setIsLoading(false);
