@@ -70,6 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             width={200}
             height={200}
             src={cardData.image}
+            unoptimized={true}
             alt="product image"
             className="w-40 h-48 mb-4 object-contain rounded-2xl border-2"
           />
@@ -100,6 +101,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               src={cardData.logo}
               alt="source website logo"
               className="w-5 h-5"
+              unoptimized={true}
             />
           </div>
         )}
