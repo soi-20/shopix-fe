@@ -14,14 +14,17 @@ export async function POST(req: Request) {
 
     const imgURL = result.data.searchFound;
 
-    const response = await fetch("http://localhost:8000/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-      body: JSON.stringify({ imgURL }),
-    });
+    const response = await fetch(
+      "https://shopix-tech.azurewebsites.net/search",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+        body: JSON.stringify({ imgURL }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
