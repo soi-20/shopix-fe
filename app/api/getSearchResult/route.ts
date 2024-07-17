@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { searchSchema } from "@/lib/validation";
 
+export const maxDuration = 45;
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
