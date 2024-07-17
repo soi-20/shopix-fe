@@ -13,7 +13,7 @@ interface ProductCardProps {
     delivery?: string;
     image: string;
     title: string;
-    rating?: string; // Rating as a string in the format "x/y"
+    rating?: string | number; // Rating as a string in the format "x/y"
     price: string; // Price as a string with currency symbol
     logo: string; // Base64 encoded logo
     link: string;
@@ -27,16 +27,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   ...props
 }) => {
   // Parse the rating
-  let ratingCheck;
+  let ratingCheck: number = 0;
   if (!(cardData.rating === undefined)) {
-    try {
-      const [ratingValue, ratingMax] = cardData.rating.split("/").map(Number);
-      ratingCheck = (ratingValue / ratingMax) * 5;
-    } catch (e) {
-      ratingCheck = cardData.rating;
+    if (typeof cardData.rating === "string") {
+      try {
+        const [ratingValue, ratingMax] = cardData.rating.split("/").map(Number);
+        if (!isNaN(ratingValue) && !isNaN(ratingMax) && ratingMax !== 0) {
+          ratingCheck = (ratingValue / ratingMax) * 5;
+        }
+      } catch (e) {
+        ratingCheck = 0; // Default value in case of error
+      }
+    } else if (typeof cardData.rating === "number") {
+      ratingCheck = cardData.rating; // Directly use the number rating
     }
-  } else {
-    ratingCheck = 0;
   }
 
   let logoCheck;
