@@ -101,6 +101,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               src={cardData.logo}
               alt="source website logo"
               className="w-5 h-5"
+              unoptimized={true}
             />
           </div>
         )}
