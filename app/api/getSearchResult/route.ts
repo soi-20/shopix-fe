@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const imgURL = result.data.searchFound;
 
     const response = await fetch(
-      "https://shopix-tech.azurewebsites.net/search",
+      "https://shoppin-tech.azurewebsites.net/search",
       {
         method: "POST",
         headers: {
