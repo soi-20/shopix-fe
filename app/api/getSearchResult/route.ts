@@ -16,17 +16,14 @@ export async function POST(req: Request) {
 
     const imgURL = result.data.searchFound;
 
-    const response = await fetch(
-      "https://shoppin-tech.azurewebsites.net/search",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-        body: JSON.stringify({ imgURL }),
-      }
-    );
+    const response = await fetch("" + process.env.BACKEND_SEARCH_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify({ imgURL }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
