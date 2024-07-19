@@ -27,6 +27,7 @@
     "react-content-loader": "^7.0.2",
     "react-dom": "^18",
     "react-hook-form": "^7.51.4",
+    "react-masonry-css": "^1.0.16",
     "react-spinners": "^0.14.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
