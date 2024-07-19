@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Lottie from "lottie-react";
 import animationData from "@/public/animation.json";
+import Masonry from "react-masonry-css";
 
 interface CardProps {
   id: number;
@@ -54,6 +55,11 @@ const InstaPosts = () => {
     router.push(`/insta/${id}`);
   };
 
+  const breakpointColumnsObj = {
+    default: 3,
+    1100: 2,
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <Image
@@ -73,12 +79,16 @@ const InstaPosts = () => {
           />
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex w-auto gap-6 mt-14 justify-items-center"
+          columnClassName="masonry-grid_column"
+        >
           {results.map((card) => (
             <div
               key={card.id}
               onClick={() => handleCardClick(card.id)}
-              className="block w-full cursor-pointer transform transition-transform duration-300 hover:scale-105 mb-2"
+              className="mb-6 cursor-pointer transform transition-transform duration-300 hover:scale-105"
               style={{
                 textDecoration: "none",
                 color: "inherit",
@@ -96,7 +106,7 @@ const InstaPosts = () => {
               </p>
             </div>
           ))}
-        </div>
+        </Masonry>
       )}
     </div>
   );
