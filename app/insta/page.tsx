@@ -19,36 +19,44 @@ const InstaPosts = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchPromise = fetch("/api/uploadPosts", {
-          method: "GET",
-        }).then((response) => response.json());
+    const cachedData = localStorage.getItem("instaPosts");
 
-        const delayPromise = new Promise((resolve) =>
-          setTimeout(resolve, 2000)
-        );
+    if (cachedData) {
+      setResults(JSON.parse(cachedData));
+      setLoading(false);
+    } else {
+      const fetchData = async () => {
+        try {
+          const fetchPromise = fetch("/api/uploadPosts", {
+            method: "GET",
+          }).then((response) => response.json());
 
-        const [data] = await Promise.all([fetchPromise, delayPromise]);
+          const delayPromise = new Promise((resolve) =>
+            setTimeout(resolve, 2000)
+          );
 
-        const parsedData = data.map((item: any) => {
-          let posts = JSON.parse(item.posts);
-          return {
-            id: item.id,
-            image: posts.image,
-            title: posts.title,
-          };
-        });
+          const [data] = await Promise.all([fetchPromise, delayPromise]);
 
-        setResults(parsedData);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+          const parsedData = data.map((item: any) => {
+            let posts = JSON.parse(item.posts);
+            return {
+              id: item.id,
+              image: posts.image,
+              title: posts.title,
+            };
+          });
 
-    fetchData();
+          setResults(parsedData);
+          localStorage.setItem("instaPosts", JSON.stringify(parsedData));
+        } catch (error) {
+          console.error("Error fetching data", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }
   }, []);
 
   const handleCardClick = (id: number) => {
