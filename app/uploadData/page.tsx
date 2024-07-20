@@ -26,6 +26,7 @@ const UploadMultiple: React.FC = () => {
   const [imagePost, setImagePost] = useState<File | null>(null);
   const [postImagePreview, setPostImagePreview] = useState<string>("");
   const [postTitle, setPostTitle] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false); // Loading state
 
   const handlePostTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPostTitle(e.target.value);
@@ -39,8 +40,9 @@ const UploadMultiple: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true); // Start loading
     console.log(images);
 
     const formData = new FormData();
@@ -54,41 +56,42 @@ const UploadMultiple: React.FC = () => {
       }
     });
 
-    fetch("/api/getImageURLs", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        let post: Post = {
-          title: postTitle,
-          image: data.results[0],
+    try {
+      const response = await fetch("/api/getImageURLs", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+
+      let post: Post = {
+        title: postTitle,
+        image: data.results[0],
+      };
+
+      let postData = images.map((img, index) => {
+        return {
+          title: img.title,
+          price: img.price || null,
+          source: img.source || null,
+          link: img.link || null,
+          image: data.results[index + 1],
         };
+      });
 
-        let postData = images.map((img, index) => {
-          return {
-            title: img.title,
-            price: img.price || null,
-            source: img.source || null,
-            link: img.link || null,
-            image: data.results[index + 1],
-          };
-        });
+      await fetch("/api/uploadPosts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ post, postData }),
+      });
 
-        fetch("/api/uploadPosts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ post, postData }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            alert("Data uploaded successfully!");
-          })
-          .catch((err) => console.error(err));
-      })
-      .catch((err) => console.error(err));
+      alert("Data uploaded successfully!");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false); // Stop loading
+    }
   };
 
   const handleImage = (index: number, file: File) => {
@@ -121,6 +124,7 @@ const UploadMultiple: React.FC = () => {
     }
     setImages(newImages);
   };
+
   const addMoreImages = () => {
     const newImage: ImageData = {
       image: null,
@@ -228,7 +232,7 @@ const UploadMultiple: React.FC = () => {
           type="submit"
           className="bg-[#000] text-white py-2 rounded-lg hover:bg-[#888] md:w-[15%] mt-5 font-semibold w-[20%]"
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>
