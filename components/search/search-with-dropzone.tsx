@@ -1,5 +1,10 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Lottie from "lottie-react";
+import animationData from "@/public/animation.json";
 import { cn, isValidUrl } from "@/lib/utils";
 import { Form, FormField, FormMessage } from "../ui/form";
 import Dropzone from "../dropzone/dropzone";
@@ -8,10 +13,8 @@ import { Button } from "../ui/button";
 import { Loader } from "lucide-react";
 import { searchSchema } from "@/lib/validation";
 import { useSearchStore } from "@/store/searchResults";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { uploadFiles } from "@/actions/uploadThing";
 
@@ -165,46 +168,76 @@ export const SearchWithDropzone = ({
         onSubmit={form.handleSubmit(onSubmit)}
         className={cn("flex flex-col items-center gap-4 mx-6", className)}
       >
-        <FormField
-          control={form.control}
-          name="searchFound"
-          render={({ field }) => (
-            <>
-              <div className="w-full sm:w-[518px] mx-auto border-4 border-border rounded-2xl overflow-hidden">
-                <Dropzone onFileChange={handleFileChange} preview={preview} />
-              </div>
-
-              <Input
-                className="w-full sm:w-[518px] placeholder:text-border text-primary rounded-[46px] border-4"
-                placeholder={placeholder}
-                {...props}
-                {...field}
-                readOnly={!!file}
+        {isLoading ? (
+          <div className="flex justify-center items-center h-screen flex-col">
+            <div>
+              <Lottie
+                className="rounded-full"
+                animationData={animationData}
+                loop={true}
               />
+            </div>
+            <p className="text-2xl text-center mt-2 font-semibold text-gray-400">
+              Searching for similar products...
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex justify-center items-center flex-col text-center">
+              <p className="text-7xl text-center mb-6 mt-8 sm:mt-28 font-bold text-slate-500">
+                shopix
+              </p>
 
-              {form.formState.errors.searchFound && (
-                <FormMessage className="mt-4 text-center">
-                  {form.formState.errors.searchFound.message}
-                </FormMessage>
+              <p className="font-semibold text-gray-400 mb-8">
+                [Ctrl/Cmd + V] an image or image address anywhere on this page
+                (product urls ❌)
+              </p>
+            </div>
+            <FormField
+              control={form.control}
+              name="searchFound"
+              render={({ field }) => (
+                <>
+                  <div className="w-full sm:w-[518px] mx-auto border-4 border-border rounded-2xl overflow-hidden">
+                    <Dropzone
+                      onFileChange={handleFileChange}
+                      preview={preview}
+                    />
+                  </div>
+
+                  <Input
+                    className="w-full sm:w-[518px] placeholder:text-border text-primary rounded-[46px] border-4"
+                    placeholder={placeholder}
+                    {...props}
+                    {...field}
+                    readOnly={!!file}
+                  />
+
+                  {form.formState.errors.searchFound && (
+                    <FormMessage className="mt-4 text-center">
+                      {form.formState.errors.searchFound.message}
+                    </FormMessage>
+                  )}
+
+                  <Button
+                    type="submit"
+                    className={cn(
+                      "text-gray-700 rounded-full h-14 w-36 text-xl bg-gray-200 hover:bg-gray-200/90",
+                      { "cursor-not-allowed opacity-50": isLoading }
+                    )}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <p className="">search</p>
+                    )}
+                  </Button>
+                </>
               )}
-
-              <Button
-                type="submit"
-                className={cn(
-                  "text-gray-700 rounded-full h-14 w-36 text-xl bg-gray-200 hover:bg-gray-200/90",
-                  { "cursor-not-allowed opacity-50": isLoading }
-                )}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader className="h-5 w-5 animate-spin" />
-                ) : (
-                  <p className="">search</p>
-                )}
-              </Button>
-            </>
-          )}
-        />
+            />
+          </>
+        )}
       </form>
     </Form>
   );
