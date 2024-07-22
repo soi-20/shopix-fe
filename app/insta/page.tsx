@@ -13,6 +13,9 @@ interface CardProps {
   title: string;
 }
 
+// 1 minute cache timeout
+const CACHE_TIMEOUT = 60000;
+
 const InstaPosts = () => {
   const router = useRouter();
   const [results, setResults] = useState<CardProps[]>([]);
@@ -20,8 +23,14 @@ const InstaPosts = () => {
 
   useEffect(() => {
     const cachedData = localStorage.getItem("instaPosts");
+    const cacheTimestamp = localStorage.getItem("instaPostsTimestamp");
+    const now = Date.now();
 
-    if (cachedData) {
+    if (
+      cachedData &&
+      cacheTimestamp &&
+      now - parseInt(cacheTimestamp) < CACHE_TIMEOUT
+    ) {
       setResults(JSON.parse(cachedData));
       setLoading(false);
     } else {
@@ -48,6 +57,7 @@ const InstaPosts = () => {
 
           setResults(parsedData);
           localStorage.setItem("instaPosts", JSON.stringify(parsedData));
+          localStorage.setItem("instaPostsTimestamp", now.toString());
         } catch (error) {
           console.error("Error fetching data", error);
         } finally {
