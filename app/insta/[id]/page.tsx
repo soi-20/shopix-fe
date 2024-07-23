@@ -33,54 +33,46 @@ const Searches = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const cachedData = localStorage.getItem("searchResults");
+      try {
+        const response = await fetch("/api/uploadPosts", {
+          method: "GET",
+        });
+        let data = await response.json();
 
-      if (cachedData) {
-        setResults(JSON.parse(cachedData));
+        const parsedData = data.flatMap(
+          (item: { id: number; postdata: string; posts: string }) => {
+            try {
+              let postData = JSON.parse(item.postdata);
+              return postData.map((post: PostDataProps) => {
+                return {
+                  id: item.id,
+                  title: post.title,
+                  image: post.image,
+                  price: post.price,
+                  link: post.link,
+                  source: post.source,
+                };
+              });
+            } catch (error) {
+              console.error("Error parsing data", error);
+            }
+          }
+        );
+
+        let results: Results = {};
+        parsedData.forEach((item: PostDataProps) => {
+          if (results[item.id]) {
+            results[item.id].push(item);
+          } else {
+            results[item.id] = [item];
+          }
+        });
+
+        setResults(results);
         setLoading(false);
-      } else {
-        try {
-          const response = await fetch("/api/uploadPosts", {
-            method: "GET",
-          });
-          let data = await response.json();
-
-          const parsedData = data.flatMap(
-            (item: { id: number; postdata: string; posts: string }) => {
-              try {
-                let postData = JSON.parse(item.postdata);
-                return postData.map((post: PostDataProps) => {
-                  return {
-                    id: item.id,
-                    title: post.title,
-                    image: post.image,
-                    price: post.price,
-                    link: post.link,
-                    source: post.source,
-                  };
-                });
-              } catch (error) {
-                console.error("Error parsing data", error);
-              }
-            }
-          );
-
-          let results: Results = {};
-          parsedData.forEach((item: PostDataProps) => {
-            if (results[item.id]) {
-              results[item.id].push(item);
-            } else {
-              results[item.id] = [item];
-            }
-          });
-
-          setResults(results);
-          localStorage.setItem("searchResults", JSON.stringify(results));
-          setLoading(false);
-        } catch (error) {
-          console.error("Error fetching data", error);
-          setLoading(false);
-        }
+      } catch (error) {
+        console.error("Error fetching data", error);
+        setLoading(false);
       }
     };
 
