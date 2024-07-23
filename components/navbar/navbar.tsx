@@ -5,20 +5,23 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 import { handleSignOut as signOutAction } from "@/lib/auth/signoutServerAction";
+import { auth } from "@/lib/auth/authConfig";
+import Image from "next/image";
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [image, setImage] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const authStatus = await checkIsAuthenticated();
-      setIsAuthenticated(authStatus);
+      const { isAuthenticated, session } = await checkIsAuthenticated();
+      setIsAuthenticated(isAuthenticated);
+      setImage(session?.user?.image);
     };
 
     checkAuth();
   }, []);
-
   const handleSignIn = () => {
     router.push("/auth/sign-in");
   };
@@ -53,7 +56,13 @@ const Navbar = () => {
       </Link>
       <div className="flex items-center gap-8">
         {isAuthenticated ? (
-          <Button onClick={handleSignOut}>Sign Out</Button>
+          <Image
+            src={image}
+            alt="avatar"
+            width={40}
+            height={40}
+            className="rounded-full cursor-pointer"
+          ></Image>
         ) : (
           <Button onClick={handleSignIn}>Sign In</Button>
         )}
