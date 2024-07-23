@@ -64,7 +64,7 @@ const Navbar = () => {
             className="rounded-full cursor-pointer"
           ></Image>
         ) : (
-          <Button onClick={handleSignIn}>Sign In</Button>
+          <Button onClick={handleSignIn}>sign in</Button>
         )}
         <ThemeToggle />
       </div>
