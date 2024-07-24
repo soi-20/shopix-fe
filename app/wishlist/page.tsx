@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "@/components/product-card/product-card";
 
-const Cart = () => {
+const Wishlist = () => {
   const [likedItems, setLikedItems] = useState([]);
 
   useEffect(() => {
@@ -36,4 +36,4 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+export default Wishlist;
