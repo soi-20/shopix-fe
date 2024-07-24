@@ -2,7 +2,7 @@
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import Image from "next/image";
-import pool from "@/lib/db";
+import { pool } from "@/lib/db";
 
 interface ImageData {
   image: File | null;

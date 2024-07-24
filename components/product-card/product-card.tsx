@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
-import ShareIcon from "../icons/share-icon";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { StarIcon } from "../icons/star-icon";
+import { GoHeart, GoHeartFill } from "react-icons/go";
 
 interface ProductCardProps {
   className?: string;
@@ -26,9 +26,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   className,
   ...props
 }) => {
+  const [addedToCart, setAddedToCart] = useState(false);
+
   // Parse the rating
   let ratingCheck: number = 0;
-  if (!(cardData.rating === undefined)) {
+  if (cardData.rating !== undefined) {
     if (typeof cardData.rating === "string") {
       try {
         const [ratingValue, ratingMax] = cardData.rating.split("/").map(Number);
@@ -43,19 +45,33 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   }
 
-  let logoCheck;
-  if (!(cardData.logo === undefined)) {
-    logoCheck = cardData.logo;
-  } else {
-    logoCheck = "no logo";
-  }
+  let logoCheck = cardData.logo || "no logo";
+  let deliveryCheck = cardData.delivery || "";
 
-  let deliveryCheck;
-  if (!(cardData.delivery === undefined)) {
-    deliveryCheck = cardData.delivery;
-  } else {
-    deliveryCheck = "";
-  }
+  const handleCartClick = () => {
+    setAddedToCart(!addedToCart);
+    let likedItems = JSON.parse(localStorage.getItem("likedItems") || "[]");
+
+    if (addedToCart) {
+      // Remove item from liked items
+      likedItems = likedItems.filter(
+        (item: any) => item.title !== cardData.title
+      );
+      console.log("Removed item from cart");
+    } else {
+      // Add item to liked items
+      likedItems.push(cardData);
+      console.log("Added item to cart");
+    }
+    localStorage.setItem("likedItems", JSON.stringify(likedItems));
+  };
+
+  useEffect(() => {
+    const likedItems = JSON.parse(localStorage.getItem("likedItems") || "[]");
+    if (likedItems.some((item: any) => item.title === cardData.title)) {
+      setAddedToCart(true);
+    }
+  }, [cardData.title]);
 
   return (
     <Card
@@ -65,6 +81,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
       )}
     >
       <div className="relative cursor-auto rounded-xl bg-gray-100 dark:bg-secondary/30 flex items-center justify-center overflow-hidden rounded-t-xl">
+        <div className="absolute top-2 right-2">
+          <button onClick={handleCartClick} className="p-1">
+            {addedToCart ? (
+              <GoHeartFill size={24} className="text-red-500" />
+            ) : (
+              <GoHeart size={24} className="text-[#1d1d1f]" />
+            )}
+          </button>
+        </div>
         <div className="p-4 pb-3">
           <Image
             width={200}
@@ -91,7 +116,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {logoCheck == "no logo" ? (
+        {logoCheck === "no logo" ? (
           ""
         ) : (
           <div className="absolute bottom-2 right-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
@@ -106,12 +131,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
       </div>
-
-      {/* {deliveryCheck === "" ? "" : (
-        <div className="absolute text-sm w-40 bottom-2 left-2 bg-secondary rounded-lg">
-          {deliveryCheck}
-        </div>
-      )} */}
 
       <div className="p-4 cursor-auto flex flex-col flex-grow justify-between">
         <h5 className="text-lg text-gray-600 dark:text-gray-300 font-semibold mb-4 line-clamp-2">
