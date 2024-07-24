@@ -3,8 +3,7 @@ import { SignInPage } from "./signin";
 import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 
 const SignIn: React.FC = async () => {
-  const isAuthenticated = await checkIsAuthenticated();
-
+  const { isAuthenticated, session } = await checkIsAuthenticated();
   if (isAuthenticated) {
     redirect("/");
   } else {
