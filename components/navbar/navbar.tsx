@@ -83,7 +83,7 @@ const Navbar = () => {
       <div className="flex items-center gap-8">
         {/* cart button */}
         <div className="text-[#1d1d1f]">
-          <Link href="/cart">
+          <Link href="/wishlist">
             <PiShoppingCart size={28} />
           </Link>
         </div>
