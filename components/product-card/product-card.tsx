@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   // Parse the rating
   let ratingCheck: number = 0;
-  if (!(cardData.rating === undefined)) {
+  if (cardData.rating !== undefined) {
     if (typeof cardData.rating === "string") {
       try {
         const [ratingValue, ratingMax] = cardData.rating.split("/").map(Number);
@@ -45,23 +45,33 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   }
 
-  let logoCheck;
-  if (!(cardData.logo === undefined)) {
-    logoCheck = cardData.logo;
-  } else {
-    logoCheck = "no logo";
-  }
-
-  let deliveryCheck;
-  if (!(cardData.delivery === undefined)) {
-    deliveryCheck = cardData.delivery;
-  } else {
-    deliveryCheck = "";
-  }
+  let logoCheck = cardData.logo || "no logo";
+  let deliveryCheck = cardData.delivery || "";
 
   const handleCartClick = () => {
     setAddedToCart(!addedToCart);
+    let likedItems = JSON.parse(localStorage.getItem("likedItems") || "[]");
+
+    if (addedToCart) {
+      // Remove item from liked items
+      likedItems = likedItems.filter(
+        (item: any) => item.title !== cardData.title
+      );
+      console.log("Removed item from cart");
+    } else {
+      // Add item to liked items
+      likedItems.push(cardData);
+      console.log("Added item to cart");
+    }
+    localStorage.setItem("likedItems", JSON.stringify(likedItems));
   };
+
+  useEffect(() => {
+    const likedItems = JSON.parse(localStorage.getItem("likedItems") || "[]");
+    if (likedItems.some((item: any) => item.title === cardData.title)) {
+      setAddedToCart(true);
+    }
+  }, [cardData.title]);
 
   return (
     <Card
@@ -106,7 +116,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {logoCheck == "no logo" ? (
+        {logoCheck === "no logo" ? (
           ""
         ) : (
           <div className="absolute bottom-2 right-2 flex items-center bg-white dark:bg-secondary p-1 rounded">
