@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 import { handleSignOut as signOutAction } from "@/lib/auth/signoutServerAction";
+import { PiShoppingCart } from "react-icons/pi";
 import Image from "next/image";
 
 const Navbar = () => {
@@ -80,6 +81,13 @@ const Navbar = () => {
         </p>
       </Link>
       <div className="flex items-center gap-8">
+        {/* cart button */}
+        <div className="text-[#1d1d1f]">
+          <Link href="/cart">
+            <PiShoppingCart size={28} />
+          </Link>
+        </div>
+        <ThemeToggle />
         {isAuthenticated ? (
           <div className="relative">
             <Image
@@ -107,7 +115,6 @@ const Navbar = () => {
         ) : (
           <Button onClick={handleSignIn}>sign in</Button>
         )}
-        <ThemeToggle />
       </div>
     </div>
   );
