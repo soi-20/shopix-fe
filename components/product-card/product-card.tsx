@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
-import ShareIcon from "../icons/share-icon";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { StarIcon } from "../icons/star-icon";
+import { GoHeart, GoHeartFill } from "react-icons/go";
 
 interface ProductCardProps {
   className?: string;
@@ -26,6 +26,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   className,
   ...props
 }) => {
+  const [addedToCart, setAddedToCart] = useState(false);
+
   // Parse the rating
   let ratingCheck: number = 0;
   if (!(cardData.rating === undefined)) {
@@ -57,6 +59,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
     deliveryCheck = "";
   }
 
+  const handleCartClick = () => {
+    setAddedToCart(!addedToCart);
+  };
+
   return (
     <Card
       className={cn(
@@ -65,6 +71,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
       )}
     >
       <div className="relative cursor-auto rounded-xl bg-gray-100 dark:bg-secondary/30 flex items-center justify-center overflow-hidden rounded-t-xl">
+        <div className="absolute top-2 right-2">
+          <button onClick={handleCartClick} className="p-1">
+            {addedToCart ? (
+              <GoHeartFill size={24} className="text-red-500" />
+            ) : (
+              <GoHeart size={24} className="text-[#1d1d1f]" />
+            )}
+          </button>
+        </div>
         <div className="p-4 pb-3">
           <Image
             width={200}
@@ -106,12 +121,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
       </div>
-
-      {/* {deliveryCheck === "" ? "" : (
-        <div className="absolute text-sm w-40 bottom-2 left-2 bg-secondary rounded-lg">
-          {deliveryCheck}
-        </div>
-      )} */}
 
       <div className="p-4 cursor-auto flex flex-col flex-grow justify-between">
         <h5 className="text-lg text-gray-600 dark:text-gray-300 font-semibold mb-4 line-clamp-2">
