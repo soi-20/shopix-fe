@@ -7,14 +7,12 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 import { handleSignOut as signOutAction } from "@/lib/auth/signoutServerAction";
-import { auth } from "@/lib/auth/authConfig";
 import Image from "next/image";
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [image, setImage] = useState<any>(null);
   const router = useRouter();
-
   useEffect(() => {
     const checkAuth = async () => {
       const { isAuthenticated, session } = await checkIsAuthenticated();
