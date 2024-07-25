@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Lottie from "lottie-react";
 import animationData from "@/public/animation.json";
 import { cn, isValidUrl } from "@/lib/utils";
