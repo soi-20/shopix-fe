@@ -2,6 +2,8 @@ import { auth_pool as pool } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 
+export const maxDuration = 60;
+
 export async function GET(req: Request) {
   try {
     const { isAuthenticated, session } = await checkIsAuthenticated();
