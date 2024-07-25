@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Lottie from "lottie-react";
 import animationData from "@/public/animation.json";
 import { cn, isValidUrl } from "@/lib/utils";
@@ -17,6 +16,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { uploadFiles } from "@/actions/uploadThing";
+import { v4 as uuidv4 } from "uuid";
+
+interface Product {
+  id?: string;
+  delivery?: string;
+  image: string;
+  title: string;
+  rating?: string | number; // Rating as a string in the format "x/y"
+  price: string; // Price as a string with currency symbol
+  logo: string; // Base64 encoded logo
+  link: string;
+  source?: string; // Site name
+}
+type SearchResults = Product[];
 
 interface SearchWithDropzoneProps {
   value?: string;
@@ -135,7 +148,18 @@ export const SearchWithDropzone = ({
         if (!response.ok) throw new Error("Status code: " + response.status);
 
         const data = await response.json();
-        setResults(data.results);
+
+        // Add unique IDs to each product
+        const productsWithIds = data.results.map((product: Product) => ({
+          ...product,
+          id: uuidv4(),
+        }));
+
+        setResults(productsWithIds);
+
+        // Add the results to the database
+        await addProductsToDatabase(productsWithIds);
+
         setIsLoading(false);
         form.reset();
         console.log("new showing image input results on search page");
@@ -150,7 +174,18 @@ export const SearchWithDropzone = ({
         if (!response.ok) throw new Error("Status code: " + response.status);
 
         const data = await response.json();
-        setResults(data.results);
+
+        // Add unique IDs to each product
+        const productsWithIds = data.results.map((product: Product) => ({
+          ...product,
+          id: uuidv4(),
+        }));
+
+        setResults(productsWithIds);
+
+        // Add the results to the database
+        await addProductsToDatabase(productsWithIds);
+
         setIsLoading(false);
         form.reset();
         console.log("new showing text input results on search page");
@@ -159,6 +194,28 @@ export const SearchWithDropzone = ({
     } catch (error) {
       console.error("Search failed:", error);
       setIsLoading(false);
+    }
+  };
+
+  const addProductsToDatabase = async (products: SearchResults) => {
+    try {
+      console.log("Adding products to database:", products);
+      const response = await fetch("/api/postProductDetails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(products),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Products added successfully:", data);
+      } else {
+        console.error("Error adding products:", data.error);
+      }
+    } catch (error) {
+      console.error("Error adding products:", error);
     }
   };
 

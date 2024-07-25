@@ -6,8 +6,10 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { StarIcon } from "../icons/star-icon";
 import { GoHeart, GoHeartFill } from "react-icons/go";
+import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 
 interface ProductCardProps {
+  userId?: string | undefined;
   className?: string;
   cardData: {
     delivery?: string;
@@ -18,16 +20,17 @@ interface ProductCardProps {
     logo: string; // Base64 encoded logo
     link: string;
     source: string;
+    id?: string; // Unique ID for the product
   };
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
+  userId,
   cardData,
   className,
   ...props
 }) => {
   const [addedToCart, setAddedToCart] = useState(false);
-
   // Parse the rating
   let ratingCheck: number = 0;
   if (cardData.rating !== undefined) {
@@ -48,30 +51,67 @@ const ProductCard: React.FC<ProductCardProps> = ({
   let logoCheck = cardData.logo || "no logo";
   let deliveryCheck = cardData.delivery || "";
 
-  const handleCartClick = () => {
+  const handleCartClick = async () => {
     setAddedToCart(!addedToCart);
     let likedItems = JSON.parse(localStorage.getItem("likedItems") || "[]");
 
     if (addedToCart) {
       // Remove item from liked items
-      likedItems = likedItems.filter(
-        (item: any) => item.title !== cardData.title
-      );
-      console.log("Removed item from cart");
+      likedItems = likedItems.filter((item: any) => item.id !== cardData.id);
+
+      // Sync with the backend
+      if (userId) {
+        try {
+          await fetch("/api/removeFromWishlist", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId,
+              productId: cardData.id,
+            }),
+          });
+        } catch (error) {
+          console.error("Error removing item from wishlist:", error);
+        }
+      } else {
+        console.error("User not authenticated");
+      }
     } else {
       // Add item to liked items
       likedItems.push(cardData);
-      console.log("Added item to cart");
+
+      // Sync with the backend
+      if (userId) {
+        try {
+          await fetch("/api/postToWishlist", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId,
+              product: cardData,
+            }),
+          });
+        } catch (error) {
+          console.error("Error adding item to wishlist:", error);
+        }
+      } else {
+        console.error("User not authenticated");
+      }
     }
+
     localStorage.setItem("likedItems", JSON.stringify(likedItems));
   };
 
   useEffect(() => {
     const likedItems = JSON.parse(localStorage.getItem("likedItems") || "[]");
-    if (likedItems.some((item: any) => item.title === cardData.title)) {
+    if (likedItems.some((item: any) => item.id === cardData.id)) {
       setAddedToCart(true);
     }
-  }, [cardData.title]);
+  }, [cardData.id]);
 
   return (
     <Card

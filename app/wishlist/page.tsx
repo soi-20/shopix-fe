@@ -4,13 +4,24 @@ import ProductCard from "@/components/product-card/product-card";
 
 const Wishlist = () => {
   const [likedItems, setLikedItems] = useState([]);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    // Retrieve liked items from localStorage
-    const storedLikedItems = localStorage.getItem("likedItems");
-    if (storedLikedItems) {
-      setLikedItems(JSON.parse(storedLikedItems));
-    }
+    const fetchWishlistItems = async () => {
+      try {
+        const response = await fetch("/api/fetchWishlistItems");
+        if (!response.ok) {
+          throw new Error("Failed to fetch wishlist items");
+        }
+        const data = await response.json();
+        setLikedItems(data.wishlistItems);
+        setUserId(data.userId);
+      } catch (error) {
+        console.error("Error fetching wishlist items:", error);
+      }
+    };
+
+    fetchWishlistItems();
   }, []);
 
   return (
@@ -26,6 +37,7 @@ const Wishlist = () => {
                 className="w-full cursor-pointer"
                 key={index}
                 cardData={card}
+                userId={userId}
               />
             ))}
         </div>
