@@ -1,6 +1,8 @@
 import { auth_pool as pool } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   const products = await req.json();
 
