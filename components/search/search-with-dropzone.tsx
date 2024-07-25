@@ -18,6 +18,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { uploadFiles } from "@/actions/uploadThing";
 
+interface Product {
+  delivery?: string;
+  image: string;
+  title: string;
+  rating?: string | number; // Rating as a string in the format "x/y"
+  price: string; // Price as a string with currency symbol
+  logo: string; // Base64 encoded logo
+  link: string;
+  source?: string; // Site name
+}
+type SearchResults = Product[];
+
 interface SearchWithDropzoneProps {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -136,6 +148,10 @@ export const SearchWithDropzone = ({
 
         const data = await response.json();
         setResults(data.results);
+
+        // Add the results to the database
+        await addProductsToDatabase(data.results);
+
         setIsLoading(false);
         form.reset();
         console.log("new showing image input results on search page");
@@ -151,6 +167,10 @@ export const SearchWithDropzone = ({
 
         const data = await response.json();
         setResults(data.results);
+
+        // Add the results to the database
+        await addProductsToDatabase(data.results);
+
         setIsLoading(false);
         form.reset();
         console.log("new showing text input results on search page");
@@ -159,6 +179,28 @@ export const SearchWithDropzone = ({
     } catch (error) {
       console.error("Search failed:", error);
       setIsLoading(false);
+    }
+  };
+
+  const addProductsToDatabase = async (products: SearchResults) => {
+    try {
+      console.log("Adding products to database:", products);
+      const response = await fetch("/api/postProductDetails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(products),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Products added successfully:", data);
+      } else {
+        console.error("Error adding products:", data.error);
+      }
+    } catch (error) {
+      console.error("Error adding products:", error);
     }
   };
 
