@@ -17,8 +17,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { uploadFiles } from "@/actions/uploadThing";
+import { v4 as uuidv4 } from "uuid";
 
 interface Product {
+  id?: string;
   delivery?: string;
   image: string;
   title: string;
@@ -147,10 +149,17 @@ export const SearchWithDropzone = ({
         if (!response.ok) throw new Error("Status code: " + response.status);
 
         const data = await response.json();
-        setResults(data.results);
+
+        // Add unique IDs to each product
+        const productsWithIds = data.results.map((product: Product) => ({
+          ...product,
+          id: uuidv4(),
+        }));
+
+        setResults(productsWithIds);
 
         // Add the results to the database
-        await addProductsToDatabase(data.results);
+        await addProductsToDatabase(productsWithIds);
 
         setIsLoading(false);
         form.reset();
@@ -166,10 +175,17 @@ export const SearchWithDropzone = ({
         if (!response.ok) throw new Error("Status code: " + response.status);
 
         const data = await response.json();
-        setResults(data.results);
+
+        // Add unique IDs to each product
+        const productsWithIds = data.results.map((product: Product) => ({
+          ...product,
+          id: uuidv4(),
+        }));
+
+        setResults(productsWithIds);
 
         // Add the results to the database
-        await addProductsToDatabase(data.results);
+        await addProductsToDatabase(productsWithIds);
 
         setIsLoading(false);
         form.reset();
