@@ -47,10 +47,10 @@ export const handleSearch = async (
     setResults(productsWithIds);
 
     // Add the results to the database
-    await addProductsToDatabase(productsWithIds);
-
+    const search_id = await addProductsToDatabase(productsWithIds);
     resetForm();
     setIsLoading(false);
+    return search_id;
   } catch (error) {
     console.error("Search failed:", error);
     setIsLoading(false);
@@ -69,8 +69,10 @@ export const addProductsToDatabase = async (products: SearchResults) => {
     });
 
     const data = await response.json();
+    const search_id = data.searchId;
     if (response.ok) {
-      console.log("Products added successfully:", data);
+      console.log("Products added successfully:", data.message);
+      return search_id;
     } else {
       console.error("Error adding products:", data.error);
     }
