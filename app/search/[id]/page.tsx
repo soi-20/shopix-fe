@@ -4,11 +4,25 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ProductCard from "@/components/product-card/product-card";
 import SkeletonInstaCard from "@/components/skeleton/skeletonInstaCard";
+import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated"; // Import the authentication check
 
 const Searches = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
   const { id } = useParams<{ id: string }>();
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { isAuthenticated, session } = await checkIsAuthenticated();
+      if (isAuthenticated) {
+        setUserId(session?.user?.id);
+        console.log("User ID set in search/id:", session?.user?.id);
+      }
+    };
+
+    fetchSession();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,6 +60,7 @@ const Searches = () => {
               key={index}
               className="w-full cursor-pointer"
               cardData={card}
+              userId={userId} // Pass the userId here if needed
             />
           ))}
         </div>

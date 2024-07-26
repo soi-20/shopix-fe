@@ -1,17 +1,23 @@
 import { auth_pool as pool } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   const products = await req.json();
+  const { isAuthenticated, session } = await checkIsAuthenticated();
+  let userId = null;
+  if (isAuthenticated) {
+    userId = session?.user?.id;
+  }
 
   try {
     await pool.query("BEGIN");
 
     const searchResult = await pool.query(
-      "INSERT INTO search (json_response) VALUES ($1) RETURNING search_id",
-      [JSON.stringify(products)]
+      "INSERT INTO search (json_response, user_id) VALUES ($1, $2) RETURNING search_id",
+      [JSON.stringify(products), userId] // Include userId in the search table
     );
 
     // get search id
