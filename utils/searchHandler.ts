@@ -16,7 +16,10 @@ type SearchResults = Product[];
 export const handleSearch = async (
   searchQuery: string,
   setResults: (results: SearchResults) => void,
-  addProductsToDatabase: (products: SearchResults) => Promise<void>,
+  addProductsToDatabase: (
+    products: SearchResults,
+    img_url: string
+  ) => Promise<void>,
   resetForm: () => void,
   setIsLoading: (isLoading: boolean) => void
 ) => {
@@ -36,8 +39,8 @@ export const handleSearch = async (
 
     if (!response.ok) throw new Error("Status code: " + response.status);
 
-    const data = await response.json();
-
+    const { data, imgURL } = await response.json();
+    console.log(imgURL);
     // Add unique IDs to each product
     const productsWithIds = data.results.map((product: Product) => ({
       ...product,
@@ -47,7 +50,7 @@ export const handleSearch = async (
     setResults(productsWithIds);
 
     // Add the results to the database
-    const search_id = await addProductsToDatabase(productsWithIds);
+    const search_id = await addProductsToDatabase(productsWithIds, imgURL);
     resetForm();
     setIsLoading(false);
     return search_id;
@@ -57,7 +60,10 @@ export const handleSearch = async (
   }
 };
 
-export const addProductsToDatabase = async (products: SearchResults) => {
+export const addProductsToDatabase = async (
+  products: SearchResults,
+  img_url: string
+) => {
   try {
     console.log("Adding products to database:", products);
     const response = await fetch("/api/postProductDetails", {
@@ -65,7 +71,7 @@ export const addProductsToDatabase = async (products: SearchResults) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(products),
+      body: JSON.stringify({ products, img_url }),
     });
 
     const data = await response.json();

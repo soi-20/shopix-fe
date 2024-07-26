@@ -62,5 +62,6 @@ CREATE TABLE IF NOT EXISTS search (
   json_response TEXT NOT NULL,
   user_id BIGINT,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  image_url TEXT,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
