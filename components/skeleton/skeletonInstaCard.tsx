@@ -3,12 +3,12 @@ import ContentLoader from "react-content-loader";
 
 const SkeletonInstaCard = (props: any) => (
   <ContentLoader
-    speed={2}
+    speed={1}
     width={300}
     height={500}
     viewBox="0 0 300 500"
-    backgroundColor="#f3f3f3"
-    foregroundColor="#ecebeb"
+    backgroundColor="#fafafa"
+    foregroundColor="#eaeaea"
     {...props}
   >
     {/* Image placeholder */}

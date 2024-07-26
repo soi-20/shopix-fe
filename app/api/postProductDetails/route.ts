@@ -14,6 +14,9 @@ export async function POST(req: Request) {
       [JSON.stringify(products)]
     );
 
+    // get search id
+    const search_id = searchResult.rows[0].search_id;
+
     for (const product of products) {
       let { id, link, price, logo, title, image, rating } = product;
 
@@ -52,7 +55,10 @@ export async function POST(req: Request) {
     }
 
     await pool.query("COMMIT");
-    return NextResponse.json({ message: "Products inserted successfully" });
+    return NextResponse.json({
+      message: "Products inserted successfully",
+      searchId: search_id,
+    });
   } catch (error) {
     await pool.query("ROLLBACK");
     console.error("Error inserting data", error);
