@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Lottie from "lottie-react";
 import animationData from "@/public/animation.json";
-import { cn, isValidUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Form, FormField, FormMessage } from "../ui/form";
 import Dropzone from "../dropzone/dropzone";
 import { Input } from "../ui/input";
@@ -16,20 +15,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { uploadFiles } from "@/actions/uploadThing";
-import { v4 as uuidv4 } from "uuid";
-
-interface Product {
-  id?: string;
-  delivery?: string;
-  image: string;
-  title: string;
-  rating?: string | number; // Rating as a string in the format "x/y"
-  price: string; // Price as a string with currency symbol
-  logo: string; // Base64 encoded logo
-  link: string;
-  source?: string; // Site name
-}
-type SearchResults = Product[];
+import {
+  handleSearch,
+  addProductsToDatabase,
+  isValidUrl,
+} from "@/utils/searchHandler";
+import { useRouter } from "next/navigation";
 
 interface SearchWithDropzoneProps {
   value?: string;
@@ -140,82 +131,27 @@ export const SearchWithDropzone = ({
 
           searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
         }
-        const response = await fetch("/api/getSearchResult", {
-          method: "POST",
-          body: JSON.stringify({ searchFound: searchQuery }),
-        });
 
-        if (!response.ok) throw new Error("Status code: " + response.status);
-
-        const data = await response.json();
-
-        // Add unique IDs to each product
-        const productsWithIds = data.results.map((product: Product) => ({
-          ...product,
-          id: uuidv4(),
-        }));
-
-        setResults(productsWithIds);
-
-        // Add the results to the database
-        await addProductsToDatabase(productsWithIds);
+        await handleSearch(
+          searchQuery,
+          setResults,
+          addProductsToDatabase,
+          form.reset,
+          setIsLoading
+        );
 
         setIsLoading(false);
-        form.reset();
-        console.log("new showing image input results on search page");
-        router.push(`/search`);
+        router.push("/search");
       } else {
-        console.log(searchQuery);
-        const response = await fetch("/api/getTextSearchResult", {
-          method: "POST",
-          body: JSON.stringify({ searchFound: searchQuery }),
+        form.setError("searchFound", {
+          type: "manual",
+          message: "Please enter a valid URL!",
         });
-
-        if (!response.ok) throw new Error("Status code: " + response.status);
-
-        const data = await response.json();
-
-        // Add unique IDs to each product
-        const productsWithIds = data.results.map((product: Product) => ({
-          ...product,
-          id: uuidv4(),
-        }));
-
-        setResults(productsWithIds);
-
-        // Add the results to the database
-        await addProductsToDatabase(productsWithIds);
-
         setIsLoading(false);
-        form.reset();
-        console.log("new showing text input results on search page");
-        router.push(`/search`);
       }
     } catch (error) {
       console.error("Search failed:", error);
       setIsLoading(false);
-    }
-  };
-
-  const addProductsToDatabase = async (products: SearchResults) => {
-    try {
-      console.log("Adding products to database:", products);
-      const response = await fetch("/api/postProductDetails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(products),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Products added successfully:", data);
-      } else {
-        console.error("Error adding products:", data.error);
-      }
-    } catch (error) {
-      console.error("Error adding products:", error);
     }
   };
 
