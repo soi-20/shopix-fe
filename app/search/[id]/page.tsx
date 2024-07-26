@@ -2,13 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import ProductCard from "@/components/product-card/product-card";
 import SkeletonInstaCard from "@/components/skeleton/skeletonInstaCard";
-import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated"; // Import the authentication check
+import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 
 const Searches = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const { id } = useParams<{ id: string }>();
 
@@ -32,7 +34,8 @@ const Searches = () => {
           throw new Error("Failed to fetch search results");
         }
         const data = await response.json();
-        setResults(data);
+        setResults(data.data.results);
+        setImageUrl(data.data.image_url);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);
@@ -54,15 +57,28 @@ const Searches = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
-          {results.map((card, index) => (
-            <ProductCard
-              key={index}
-              className="w-full cursor-pointer"
-              cardData={card}
-              userId={userId} // Pass the userId here if needed
-            />
-          ))}
+        <div>
+          {imageUrl && (
+            <div className="flex justify-center items-center mb-6">
+              <Image
+                src={imageUrl}
+                alt="searched product"
+                width={200}
+                height={200}
+                className="w-24 h-auto rounded-lg"
+              />
+            </div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
+            {results.map((card, index) => (
+              <ProductCard
+                key={index}
+                className="w-full cursor-pointer"
+                cardData={card}
+                userId={userId}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
