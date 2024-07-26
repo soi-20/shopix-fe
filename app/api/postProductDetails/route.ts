@@ -9,6 +9,11 @@ export async function POST(req: Request) {
   try {
     await pool.query("BEGIN");
 
+    const searchResult = await pool.query(
+      "INSERT INTO search (json_response) VALUES ($1) RETURNING search_id",
+      [JSON.stringify(products)]
+    );
+
     for (const product of products) {
       let { id, link, price, logo, title, image, rating } = product;
 
