@@ -18,6 +18,7 @@ import {
   addProductsToDatabase,
   isValidUrl,
 } from "@/utils/searchHandler";
+import { useRouter } from "next/navigation";
 
 interface SearchWithIconProps {
   value?: string;
@@ -41,6 +42,7 @@ export const SearchWithIcon = ({
     },
   });
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const setResults = useSearchStore((state) => state.setResults);
 
   const onSubmit = async (values: z.infer<typeof searchSchema>) => {
@@ -52,13 +54,14 @@ export const SearchWithIcon = ({
       return;
     }
 
-    await handleSearch(
+    const search_id = await handleSearch(
       values.searchFound,
       setResults,
       addProductsToDatabase,
       form.reset,
       setIsLoading
     );
+    router.push(`/search/${search_id}`);
   };
 
   const { theme, setTheme } = useTheme();

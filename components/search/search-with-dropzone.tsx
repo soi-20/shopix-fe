@@ -132,7 +132,7 @@ export const SearchWithDropzone = ({
           searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
         }
 
-        await handleSearch(
+        const search_id = await handleSearch(
           searchQuery,
           setResults,
           addProductsToDatabase,
@@ -141,7 +141,7 @@ export const SearchWithDropzone = ({
         );
 
         setIsLoading(false);
-        router.push("/search");
+        router.push(`/search/${search_id}`);
       } else {
         form.setError("searchFound", {
           type: "manual",
