@@ -32,7 +32,8 @@ export async function POST(req: Request) {
     const data = await response.json();
     console.log(data);
 
-    return NextResponse.json(data);
+    // return both data and image url
+    return NextResponse.json({ data, imgURL });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
