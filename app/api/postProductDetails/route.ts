@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const products = await req.json();
+  const { products, img_url } = await req.json();
   const { isAuthenticated, session } = await checkIsAuthenticated();
   let userId = null;
   if (isAuthenticated) {
@@ -16,8 +16,8 @@ export async function POST(req: Request) {
     await pool.query("BEGIN");
 
     const searchResult = await pool.query(
-      "INSERT INTO search (json_response, user_id) VALUES ($1, $2) RETURNING search_id",
-      [JSON.stringify(products), userId] // Include userId in the search table
+      "INSERT INTO search (json_response, user_id, image_url) VALUES ($1, $2, $3) RETURNING search_id",
+      [JSON.stringify(products), userId, img_url] // Include userId in the search table
     );
 
     // get search id
