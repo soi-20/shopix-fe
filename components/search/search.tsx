@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import SearchIcon from "../icons/search-icon";
-import { cn, isValidUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,20 +13,11 @@ import { Form, FormField, FormMessage } from "../ui/form";
 import { useTheme } from "next-themes";
 import { useSearchStore } from "@/store/searchResults";
 import { Loader } from "lucide-react";
-import { v4 as uuidv4 } from "uuid";
-
-interface Product {
-  id?: string;
-  delivery?: string;
-  image: string;
-  title: string;
-  rating?: string | number; // Rating as a string in the format "x/y"
-  price: string; // Price as a string with currency symbol
-  logo: string; // Base64 encoded logo
-  link: string;
-  source?: string; // Site name
-}
-type SearchResults = Product[];
+import {
+  handleSearch,
+  addProductsToDatabase,
+  isValidUrl,
+} from "@/utils/searchHandler";
 
 interface SearchWithIconProps {
   value?: string;
@@ -53,100 +44,21 @@ export const SearchWithIcon = ({
   const setResults = useSearchStore((state) => state.setResults);
 
   const onSubmit = async (values: z.infer<typeof searchSchema>) => {
-    console.log("reached");
-
-    try {
-      setIsLoading(true);
-
-      if (!values.searchFound) {
-        form.setError("searchFound", {
-          type: "manual",
-          message:
-            "Please upload a file or paste an image URL in the text input!",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      let searchQuery = values.searchFound;
-      console.log(searchQuery);
-
-      if (isValidUrl(searchQuery)) {
-        const response = await fetch("/api/getSearchResult", {
-          method: "POST",
-          body: JSON.stringify({ searchFound: searchQuery }),
-        });
-
-        if (!response.ok) throw new Error("Status code: " + response.status);
-
-        const data = await response.json();
-
-        // Add unique IDs to each product
-        const productsWithIds = data.results.map((product: Product) => ({
-          ...product,
-          id: uuidv4(),
-        }));
-
-        setResults(productsWithIds);
-
-        // Add the results to the database
-        await addProductsToDatabase(productsWithIds);
-
-        setIsLoading(false);
-        form.reset();
-        console.log("new showing image input results on search page");
-      } else {
-        console.log(searchQuery);
-        const response = await fetch("/api/getTextSearchResult", {
-          method: "POST",
-          body: JSON.stringify({ searchFound: searchQuery }),
-        });
-
-        if (!response.ok) throw new Error("Status code: " + response.status);
-
-        const data = await response.json();
-
-        // Add unique IDs to each product
-        const productsWithIds = data.results.map((product: Product) => ({
-          ...product,
-          id: uuidv4(),
-        }));
-
-        setResults(productsWithIds);
-
-        // Add the results to the database
-        await addProductsToDatabase(productsWithIds);
-
-        setIsLoading(false);
-        form.reset();
-        console.log("new showing text input results on search page");
-      }
-    } catch (error) {
-      console.error("Search failed:", error);
-      setIsLoading(false);
-    }
-  };
-
-  const addProductsToDatabase = async (products: SearchResults) => {
-    try {
-      console.log("Adding products to database:", products);
-      const response = await fetch("/api/postProductDetails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(products),
+    if (!values.searchFound || !isValidUrl(values.searchFound)) {
+      form.setError("searchFound", {
+        type: "manual",
+        message: "Please enter a valid URL!",
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Products added successfully:", data);
-      } else {
-        console.error("Error adding products:", data.error);
-      }
-    } catch (error) {
-      console.error("Error adding products:", error);
+      return;
     }
+
+    await handleSearch(
+      values.searchFound,
+      setResults,
+      addProductsToDatabase,
+      form.reset,
+      setIsLoading
+    );
   };
 
   const { theme, setTheme } = useTheme();
