@@ -55,3 +55,10 @@ CREATE TABLE IF NOT EXISTS wishlist (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
   UNIQUE (user_id, product_id)  -- Ensure that each user can only have one entry per product
 );
+
+
+CREATE TABLE IF NOT EXISTS search (
+  search_id BIGSERIAL PRIMARY KEY,
+  json_response TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
