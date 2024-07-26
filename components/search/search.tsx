@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import SearchIcon from "../icons/search-icon";
@@ -10,14 +10,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { searchSchema } from "@/lib/validation";
 import { Form, FormField, FormMessage } from "../ui/form";
-import { useRouter } from "next/navigation";
-
 import { useTheme } from "next-themes";
 import { useSearchStore } from "@/store/searchResults";
 import { Loader } from "lucide-react";
-import { uploadFiles } from "@/actions/uploadThing";
+import { v4 as uuidv4 } from "uuid";
 
-interface SearchProps {
+interface Product {
+  id?: string;
+  delivery?: string;
+  image: string;
+  title: string;
+  rating?: string | number; // Rating as a string in the format "x/y"
+  price: string; // Price as a string with currency symbol
+  logo: string; // Base64 encoded logo
+  link: string;
+  source?: string; // Site name
+}
+type SearchResults = Product[];
+
+interface SearchWithIconProps {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder: string;
@@ -31,7 +42,7 @@ export const SearchWithIcon = ({
   placeholder,
   className,
   ...props
-}: SearchProps) => {
+}: SearchWithIconProps) => {
   const form = useForm<z.infer<typeof searchSchema>>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
@@ -39,70 +50,15 @@ export const SearchWithIcon = ({
     },
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const setResults = useSearchStore((state) => state.setResults);
-  const router = useRouter();
 
-  useEffect(() => {
-    const handlePaste = (event: ClipboardEvent) => {
-      console.log("Paste event detected");
-      const items = event.clipboardData?.items;
-      let urlFound = false;
-
-      if (items) {
-        for (let i = 0; i < items.length; i++) {
-          if (items[i].type.startsWith("image")) {
-            console.log("Image found in clipboard");
-            const blob = items[i].getAsFile();
-            if (blob) {
-              console.log("Blob obtained from clipboard", blob);
-              setFile(blob);
-              handleFileChange(blob);
-              return;
-            }
-          } else if (items[i].type === "text/plain") {
-            items[i].getAsString((text) => {
-              if (text && form.getValues().searchFound !== "Image Added") {
-                console.log("URL/Text found in clipboard", text);
-                form.setValue("searchFound", text);
-                urlFound = true;
-              }
-            });
-          }
-        }
-      }
-    };
-
-    document.addEventListener("paste", handlePaste);
-
-    return () => {
-      document.removeEventListener("paste", handlePaste);
-    };
-  }, [form]);
-
-  useEffect(() => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setPreview(reader.result as string);
-      reader.readAsDataURL(file);
-      form.setValue("searchFound", "Image Added");
-    } else {
-      setPreview(null);
-      form.setValue("searchFound", "");
-    }
-  }, [file, form]);
-
-  const handleFileChange = (file: File | null) => {
-    setFile(file);
-  };
   const onSubmit = async (values: z.infer<typeof searchSchema>) => {
     console.log("reached");
 
     try {
       setIsLoading(true);
 
-      if (!values.searchFound && !file) {
+      if (!values.searchFound) {
         form.setError("searchFound", {
           type: "manual",
           message:
@@ -115,19 +71,7 @@ export const SearchWithIcon = ({
       let searchQuery = values.searchFound;
       console.log(searchQuery);
 
-      if (file || isValidUrl(searchQuery)) {
-        if (file) {
-          const formData = new FormData();
-          formData.append("file", file);
-
-          console.log(formData, file, "uploading image");
-
-          const uploadedInputImage = await uploadFiles(formData);
-
-          console.log(uploadedInputImage, "uploadedInputImage");
-
-          searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
-        }
+      if (isValidUrl(searchQuery)) {
         const response = await fetch("/api/getSearchResult", {
           method: "POST",
           body: JSON.stringify({ searchFound: searchQuery }),
@@ -136,11 +80,21 @@ export const SearchWithIcon = ({
         if (!response.ok) throw new Error("Status code: " + response.status);
 
         const data = await response.json();
-        setResults(data.results);
+
+        // Add unique IDs to each product
+        const productsWithIds = data.results.map((product: Product) => ({
+          ...product,
+          id: uuidv4(),
+        }));
+
+        setResults(productsWithIds);
+
+        // Add the results to the database
+        await addProductsToDatabase(productsWithIds);
+
         setIsLoading(false);
         form.reset();
         console.log("new showing image input results on search page");
-        router.push(`/search`);
       } else {
         console.log(searchQuery);
         const response = await fetch("/api/getTextSearchResult", {
@@ -151,15 +105,47 @@ export const SearchWithIcon = ({
         if (!response.ok) throw new Error("Status code: " + response.status);
 
         const data = await response.json();
-        setResults(data.results);
+
+        // Add unique IDs to each product
+        const productsWithIds = data.results.map((product: Product) => ({
+          ...product,
+          id: uuidv4(),
+        }));
+
+        setResults(productsWithIds);
+
+        // Add the results to the database
+        await addProductsToDatabase(productsWithIds);
+
         setIsLoading(false);
         form.reset();
         console.log("new showing text input results on search page");
-        router.push(`/search`);
       }
     } catch (error) {
       console.error("Search failed:", error);
       setIsLoading(false);
+    }
+  };
+
+  const addProductsToDatabase = async (products: SearchResults) => {
+    try {
+      console.log("Adding products to database:", products);
+      const response = await fetch("/api/postProductDetails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(products),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Products added successfully:", data);
+      } else {
+        console.error("Error adding products:", data.error);
+      }
+    } catch (error) {
+      console.error("Error adding products:", error);
     }
   };
 
@@ -214,3 +200,5 @@ export const SearchWithIcon = ({
     </Form>
   );
 };
+
+export default SearchWithIcon;

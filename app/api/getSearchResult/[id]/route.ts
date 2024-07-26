@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth_pool as pool } from "@/lib/db";
 
 export async function GET(
   request: Request,
@@ -6,27 +7,23 @@ export async function GET(
 ) {
   try {
     if (!params.id) {
-      return NextResponse.json({ error: "Missing task ID" }, { status: 400 });
+      return NextResponse.json({ error: "Missing Search ID" }, { status: 400 });
     }
 
-    const response = await fetch(
-      `https://experiments-testing.azurewebsites.net/task-status/${params.id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-        },
-        cache: "no-store",
-      }
+    const result = await pool.query(
+      "SELECT json_response FROM search WHERE search_id = $1",
+      [params.id]
     );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (result.rows.length === 0) {
+      return NextResponse.json(
+        { error: "Search ID not found" },
+        { status: 404 }
+      );
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    const jsonResponse = result.rows[0].json_response;
+    return NextResponse.json(JSON.parse(jsonResponse));
   } catch (error) {
     console.error(error);
     return NextResponse.json(
