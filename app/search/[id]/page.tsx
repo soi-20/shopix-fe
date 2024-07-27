@@ -6,6 +6,8 @@ import Image from "next/image";
 import ProductCard from "@/components/product-card/product-card";
 import SkeletonInstaCard from "@/components/skeleton/skeletonInstaCard";
 import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
+import { SearchWithIcon } from "@/components/search/search";
+import { useSearchStore } from "@/store/searchResults";
 
 const Searches = () => {
   const [results, setResults] = useState([]);
@@ -13,6 +15,7 @@ const Searches = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const { id } = useParams<{ id: string }>();
+  // const searchResults = useSearchStore((state) => state.results);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -25,6 +28,8 @@ const Searches = () => {
 
     fetchSession();
   }, []);
+
+  // TODO : If user not authenticated, then show both image and results for the current search
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +55,11 @@ const Searches = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <SearchWithIcon
+        placeholder="want something different"
+        className="items-center justify-center mb-6"
+      />
+
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
           {[...Array(6)].map((_, index) => (
@@ -70,6 +80,14 @@ const Searches = () => {
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-14 justify-items-center">
+            {results.map((card, index) => (
+              <ProductCard
+                key={index}
+                className="w-full cursor-pointer"
+                cardData={card}
+                userId={userId}
+              />
+            ))}
             {results.map((card, index) => (
               <ProductCard
                 key={index}
