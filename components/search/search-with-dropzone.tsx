@@ -132,13 +132,25 @@ export const SearchWithDropzone = ({
           searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
         }
 
-        const search_id = await handleSearch(
+        const searchResponse = await handleSearch(
           searchQuery,
           setResults,
           addProductsToDatabase,
           form.reset,
           setIsLoading
         );
+
+        if (!searchResponse) {
+          console.error("search failed due to unexpected reason: ", {
+            searchQuery,
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const { search_id, imgURL } = searchResponse;
+
+        localStorage.setItem(`image_url_${search_id}`, imgURL ?? "");
 
         setIsLoading(false);
         router.push(`/search/${search_id}`);

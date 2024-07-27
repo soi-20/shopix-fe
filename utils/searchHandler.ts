@@ -22,7 +22,10 @@ export const handleSearch = async (
   ) => Promise<void>,
   resetForm: () => void,
   setIsLoading: (isLoading: boolean) => void
-) => {
+): Promise<{
+  search_id?: string;
+  imgURL?: string;
+} | null> => {
   try {
     setIsLoading(true);
 
@@ -50,13 +53,21 @@ export const handleSearch = async (
     setResults(productsWithIds);
 
     // Add the results to the database
-    const search_id = await addProductsToDatabase(productsWithIds, imgURL);
+    const search_id =
+      (await addProductsToDatabase(productsWithIds, imgURL)) ?? "";
+
     resetForm();
     setIsLoading(false);
-    return search_id;
+
+    if (!search_id) {
+      return null;
+    }
+
+    return { search_id, imgURL };
   } catch (error) {
     console.error("Search failed:", error);
     setIsLoading(false);
+    return null;
   }
 };
 

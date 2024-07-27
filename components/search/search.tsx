@@ -54,13 +54,26 @@ export const SearchWithIcon = ({
       return;
     }
 
-    const search_id = await handleSearch(
+    const searchResponse = await handleSearch(
       values.searchFound,
       setResults,
       addProductsToDatabase,
       form.reset,
       setIsLoading
     );
+
+    if (!searchResponse) {
+      console.error("search failed due to unexpected reason: ", {
+        searchFound: values.searchFound,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { search_id, imgURL } = searchResponse;
+
+    localStorage.setItem(`image_url_${search_id}`, imgURL ?? "");
+
     router.push(`/search/${search_id}`);
   };
 

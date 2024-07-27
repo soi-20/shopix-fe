@@ -40,7 +40,21 @@ const Searches = () => {
         }
         const data = await response.json();
         setResults(data.data.results);
-        setImageUrl(data.data.image_url);
+
+        if (data?.data?.image_url) {
+          setImageUrl(data.data.image_url);
+        } else {
+          console.log("Backend did not send imgURL, searching cache. ", {
+            searchId: id,
+          });
+          const imageUrlCached = localStorage.getItem(`image_url_${id}`);
+          if (imageUrlCached) {
+            setImageUrl(imageUrlCached);
+          } else {
+            console.log("No image found in cache", { searchId: id });
+          }
+        }
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);
