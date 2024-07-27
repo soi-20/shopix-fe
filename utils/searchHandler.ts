@@ -78,7 +78,7 @@ export const handleSearchStreaming = async (
     products: SearchResults,
     img_url: string,
     searchId?: string
-  ) => Promise<void>,
+  ) => Promise<string | void>,
   resetForm: () => void,
   setIsLoading: (isLoading: boolean) => void,
   results?: SearchResults,
@@ -101,67 +101,56 @@ export const handleSearchStreaming = async (
 
     const endpoint = "http://localhost:8000/search-stream";
 
-    const netStartTime = Date.now();
+    const response = await fetch(endpoint, requestOptions);
+    const reader = response.body.getReader();
+    let lastTime = Date.now();
+    let searchId: string | null = null;
 
-    console.log("Sending POST request to the server...");
-    // Use fetch to send the POST request
-    const response = fetch(endpoint, requestOptions)
-      .then((response: any) => {
-        // The response is an event stream, so we process it accordingly
-        const reader = response.body.getReader();
-        let lastTime = Date.now();
-        let searchId: string | null = null;
+    const stream = new ReadableStream({
+      async start(controller) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            resetForm();
+            setIsLoading(false);
+            break;
+          }
 
-        return new ReadableStream({
-          async start(controller) {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) {
-                resetForm();
-                setIsLoading(false);
-                break;
-              }
-              // Assuming the server sends UTF-8 encoded text
-              const currentTime = Date.now();
-              const timeElapsed = currentTime - lastTime;
-              console.log(
-                `Time elapsed since last chunk: ${timeElapsed / 1000}s`
-              );
-              const text = new TextDecoder().decode(value);
-              console.log(text); // Log each chunk of data
-              const responseJsonStr = text.replace("data: ", "");
-              const products = JSON.parse(responseJsonStr);
+          const currentTime = Date.now();
+          const timeElapsed = currentTime - lastTime;
+          console.log(`Time elapsed since last chunk: ${timeElapsed / 1000}s`);
 
-              console.log("products fetched", { searchQuery, products });
-              const productsWithIds = products.map((product: Product) => ({
-                ...product,
-                id: uuidv4(),
-              }));
+          const text = new TextDecoder().decode(value);
+          const responseJsonStr = text.replace("data: ", "");
+          const products = JSON.parse(responseJsonStr);
 
-              setResults([...(results as SearchResults), ...productsWithIds]);
+          console.log("products fetched", { searchQuery, products });
+          const productsWithIds = products.map((product: Product) => ({
+            ...product,
+            id: uuidv4(),
+          }));
 
-              if (!searchId) {
-                searchId =
-                  (await addProductsToDatabase(productsWithIds, searchQuery)) ??
-                  "";
-                if (callback) {
-                  callback(searchId);
-                }
-              } else {
-                addProductsToDatabase(productsWithIds, searchQuery, searchId);
-              }
+          setResults([...(results as SearchResults), ...productsWithIds]);
 
-              controller.enqueue(value);
+          if (!searchId) {
+            searchId =
+              (await addProductsToDatabase(productsWithIds, searchQuery)) ?? "";
+            if (callback) {
+              await callback(searchId);
             }
-            controller.close();
-            reader.releaseLock();
-          },
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching data", error);
-        setIsLoading(false);
-      });
+          } else {
+            await addProductsToDatabase(productsWithIds, searchQuery, searchId);
+          }
+
+          controller.enqueue(value);
+          lastTime = currentTime;
+        }
+        controller.close();
+        reader.releaseLock();
+      },
+    });
+
+    await new Response(stream).text();
   } catch (error) {
     console.error("Search failed:", error);
     setIsLoading(false);
@@ -172,12 +161,12 @@ export const addProductsToDatabase = async (
   products: SearchResults,
   img_url: string,
   searchId?: string
-) => {
+): Promise<string | void> => {
   try {
     let requestBody: any = { products, img_url };
 
     if (searchId) {
-      requestBody = { ...requestBody, searchId };
+      requestBody.searchId = searchId;
     }
 
     console.log("Adding products to database:", products);
@@ -186,14 +175,13 @@ export const addProductsToDatabase = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ products, img_url }),
+      body: JSON.stringify(requestBody),
     });
 
     const data = await response.json();
-    const search_id = data.searchId;
     if (response.ok) {
       console.log("Products added successfully:", data.message);
-      return search_id;
+      return data.searchId;
     } else {
       console.error("Error adding products:", data.error);
     }
