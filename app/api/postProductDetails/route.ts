@@ -15,36 +15,30 @@ export async function POST(req: Request) {
   try {
     await pool.query("BEGIN");
 
-    let searchFound = null;
-    let search_id = null;
+    let search_id = searchId;
 
     if (searchId) {
-      search_id = searchId;
-      searchFound = await pool.query(
+      const searchFound = await pool.query(
         "SELECT search_id, json_response FROM search WHERE search_id = $1",
         [searchId]
       );
-    }
 
-    if (searchFound && searchFound?.rows?.length > 0) {
-      // if search found, then simply get the record, update the products and update the record in the db
-      const { search_id: search_id_found, json_response } = searchFound.rows[0];
-      const productsFound = JSON.parse(json_response);
+      if (searchFound.rows.length > 0) {
+        // If search found, update the products and the record in the DB
+        const { json_response } = searchFound.rows[0];
+        const productsFound = JSON.parse(json_response);
 
-      const updatedProducts = [...productsFound, ...products];
+        const updatedProducts = [...productsFound, ...products];
 
-      await pool.query(
-        "UPDATE search SET json_response = $1 WHERE search_id = $2 RETURNING search_id",
-        [JSON.stringify(updatedProducts), searchId]
-      );
+        await pool.query(
+          "UPDATE search SET json_response = $1 WHERE search_id = $2",
+          [JSON.stringify(updatedProducts), searchId]
+        );
+      } else {
+        search_id = await createNewSearch(products, userId, img_url);
+      }
     } else {
-      const searchResult = await pool.query(
-        "INSERT INTO search (json_response, user_id, image_url) VALUES ($1, $2, $3) RETURNING search_id",
-        [JSON.stringify(products), userId, img_url] // Include userId in the search table
-      );
-
-      // get search id
-      search_id = searchResult.rows[0].search_id;
+      search_id = await createNewSearch(products, userId, img_url);
     }
 
     for (const product of products) {
@@ -97,4 +91,12 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+}
+
+async function createNewSearch(products: any, userId: any, img_url: any) {
+  const searchResult = await pool.query(
+    "INSERT INTO search (json_response, user_id, image_url) VALUES ($1, $2, $3) RETURNING search_id",
+    [JSON.stringify(products), userId, img_url]
+  );
+  return searchResult.rows[0].search_id;
 }
