@@ -71,11 +71,115 @@ export const handleSearch = async (
   }
 };
 
+export const handleSearchStreaming = async (
+  searchQuery: string,
+  setResults: (results: SearchResults) => void,
+  addProductsToDatabase: (
+    products: SearchResults,
+    img_url: string,
+    searchId?: string
+  ) => Promise<void>,
+  resetForm: () => void,
+  setIsLoading: (isLoading: boolean) => void,
+  results?: SearchResults,
+  callback?: (searchId: string) => Promise<void>
+): Promise<void> => {
+  try {
+    setIsLoading(true);
+
+    if (!searchQuery) {
+      throw new Error(
+        "Please upload a file or paste an image URL in the text input!"
+      );
+    }
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "text/event-stream" },
+      body: JSON.stringify({ imgURL: searchQuery }),
+    };
+
+    const endpoint = "http://localhost:8000/search-stream";
+
+    const netStartTime = Date.now();
+
+    console.log("Sending POST request to the server...");
+    // Use fetch to send the POST request
+    const response = fetch(endpoint, requestOptions)
+      .then((response: any) => {
+        // The response is an event stream, so we process it accordingly
+        const reader = response.body.getReader();
+        let lastTime = Date.now();
+        let searchId: string | null = null;
+
+        return new ReadableStream({
+          async start(controller) {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                resetForm();
+                setIsLoading(false);
+                break;
+              }
+              // Assuming the server sends UTF-8 encoded text
+              const currentTime = Date.now();
+              const timeElapsed = currentTime - lastTime;
+              console.log(
+                `Time elapsed since last chunk: ${timeElapsed / 1000}s`
+              );
+              const text = new TextDecoder().decode(value);
+              console.log(text); // Log each chunk of data
+              const responseJsonStr = text.replace("data: ", "");
+              const products = JSON.parse(responseJsonStr);
+
+              console.log("products fetched", { searchQuery, products });
+              const productsWithIds = products.map((product: Product) => ({
+                ...product,
+                id: uuidv4(),
+              }));
+
+              setResults([...(results as SearchResults), ...productsWithIds]);
+
+              if (!searchId) {
+                searchId =
+                  (await addProductsToDatabase(productsWithIds, searchQuery)) ??
+                  "";
+                if (callback) {
+                  callback(searchId);
+                }
+              } else {
+                addProductsToDatabase(productsWithIds, searchQuery, searchId);
+              }
+
+              controller.enqueue(value);
+            }
+            controller.close();
+            reader.releaseLock();
+          },
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data", error);
+        setIsLoading(false);
+      });
+  } catch (error) {
+    console.error("Search failed:", error);
+    setIsLoading(false);
+  }
+};
+
 export const addProductsToDatabase = async (
   products: SearchResults,
-  img_url: string
+  img_url: string,
+  searchId?: string
 ) => {
   try {
+    let requestBody: any = { products, img_url };
+
+    if (searchId) {
+      requestBody = { ...requestBody, searchId };
+    }
+
     console.log("Adding products to database:", products);
     const response = await fetch("/api/postProductDetails", {
       method: "POST",

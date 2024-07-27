@@ -15,7 +15,7 @@ const Searches = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const { id } = useParams<{ id: string }>();
-  // const searchResults = useSearchStore((state) => state.results);
+  const searchResults = useSearchStore((state) => state.results);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -63,9 +63,15 @@ const Searches = () => {
     };
 
     if (id) {
-      fetchData();
+      if (searchResults.length > 0) {
+        setResults(searchResults as any);
+        setLoading(false);
+        return;
+      } else {
+        fetchData();
+      }
     }
-  }, [id]);
+  }, [id, searchResults.length]);
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">

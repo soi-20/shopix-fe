@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const { products, img_url } = await req.json();
+  const { products, img_url, searchId } = await req.json();
   const { isAuthenticated, session } = await checkIsAuthenticated();
   let userId = null;
   if (isAuthenticated) {
@@ -15,13 +15,37 @@ export async function POST(req: Request) {
   try {
     await pool.query("BEGIN");
 
-    const searchResult = await pool.query(
-      "INSERT INTO search (json_response, user_id, image_url) VALUES ($1, $2, $3) RETURNING search_id",
-      [JSON.stringify(products), userId, img_url] // Include userId in the search table
-    );
+    let searchFound = null;
+    let search_id = null;
 
-    // get search id
-    const search_id = searchResult.rows[0].search_id;
+    if (searchId) {
+      search_id = searchId;
+      searchFound = await pool.query(
+        "SELECT search_id, json_response FROM search WHERE search_id = $1",
+        [searchId]
+      );
+    }
+
+    if (searchFound && searchFound?.rows?.length > 0) {
+      // if search found, then simply get the record, update the products and update the record in the db
+      const { search_id: search_id_found, json_response } = searchFound.rows[0];
+      const productsFound = JSON.parse(json_response);
+
+      const updatedProducts = [...productsFound, ...products];
+
+      await pool.query(
+        "UPDATE search SET json_response = $1 WHERE search_id = $2 RETURNING search_id",
+        [JSON.stringify(updatedProducts), searchId]
+      );
+    } else {
+      const searchResult = await pool.query(
+        "INSERT INTO search (json_response, user_id, image_url) VALUES ($1, $2, $3) RETURNING search_id",
+        [JSON.stringify(products), userId, img_url] // Include userId in the search table
+      );
+
+      // get search id
+      search_id = searchResult.rows[0].search_id;
+    }
 
     for (const product of products) {
       let { id, link, price, logo, title, image, rating } = product;

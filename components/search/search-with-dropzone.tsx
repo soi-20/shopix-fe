@@ -19,8 +19,10 @@ import {
   handleSearch,
   addProductsToDatabase,
   isValidUrl,
+  handleSearchStreaming,
 } from "@/utils/searchHandler";
 import { useRouter } from "next/navigation";
+import { GlobalConfig } from "@/lib/config";
 
 interface SearchWithDropzoneProps {
   value?: string;
@@ -36,6 +38,7 @@ export const SearchWithDropzone = ({
   ...props
 }: SearchWithDropzoneProps) => {
   const setResults = useSearchStore((state) => state.setResults);
+  const results = useSearchStore((state) => state.results);
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -130,6 +133,30 @@ export const SearchWithDropzone = ({
           console.log(uploadedInputImage, "uploadedInputImage");
 
           searchQuery = uploadedInputImage?.[0].data?.url || searchQuery;
+        }
+
+        console.log("global config", GlobalConfig);
+
+        if (GlobalConfig.searchWithStreaming) {
+          // streaming logic
+
+          const callback = async (searchId: string) => {
+            localStorage.setItem(`image_url_${searchId}`, searchQuery ?? "");
+            setIsLoading(false);
+            router.push(`/search/${searchId}`);
+          };
+
+          await handleSearchStreaming(
+            searchQuery,
+            setResults,
+            addProductsToDatabase,
+            form.reset,
+            setIsLoading,
+            results,
+            callback
+          );
+
+          return;
         }
 
         const searchResponse = await handleSearch(
