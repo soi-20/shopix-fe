@@ -13,11 +13,7 @@ import { Form, FormField, FormMessage } from "../ui/form";
 import { useTheme } from "next-themes";
 import { useSearchStore } from "@/store/searchResults";
 import { Loader } from "lucide-react";
-import {
-  handleSearch,
-  addProductsToDatabase,
-  isValidUrl,
-} from "@/utils/searchHandler";
+import { handleSearch, isValidUrl } from "@/utils/searchHandler";
 import { useRouter } from "next/navigation";
 
 interface SearchWithIconProps {
@@ -57,7 +53,6 @@ export const SearchWithIcon = ({
     const searchResponse = await handleSearch(
       values.searchFound,
       setResults,
-      addProductsToDatabase,
       form.reset,
       setIsLoading
     );
@@ -70,9 +65,13 @@ export const SearchWithIcon = ({
       return;
     }
 
-    const { search_id, imgURL } = searchResponse;
+    const { search_id, imgURL, results } = searchResponse;
 
     localStorage.setItem(`image_url_${search_id}`, imgURL ?? "");
+    localStorage.setItem(
+      `search_results_${search_id}`,
+      JSON.stringify(results)
+    );
 
     router.push(`/search/${search_id}`);
   };
