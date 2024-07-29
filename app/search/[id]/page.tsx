@@ -29,32 +29,25 @@ const Searches = () => {
     fetchSession();
   }, []);
 
-  // TODO : If user not authenticated, then show both image and results for the current search
-
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const responseCached = localStorage.getItem(`searchResults_${id}`);
+        const imageCached = localStorage.getItem(`image_url_${id}`);
+        if (responseCached) {
+          setResults(JSON.parse(responseCached));
+          setImageUrl(imageCached);
+          setLoading(false);
+          return;
+        }
+
         const response = await fetch(`/api/getSearchResult/${id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch search results");
         }
         const data = await response.json();
         setResults(data.data.results);
-
-        if (data?.data?.image_url) {
-          setImageUrl(data.data.image_url);
-        } else {
-          console.log("Backend did not send imgURL, searching cache. ", {
-            searchId: id,
-          });
-          const imageUrlCached = localStorage.getItem(`image_url_${id}`);
-          if (imageUrlCached) {
-            setImageUrl(imageUrlCached);
-          } else {
-            console.log("No image found in cache", { searchId: id });
-          }
-        }
-
+        setImageUrl(data.data.image_url);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);
