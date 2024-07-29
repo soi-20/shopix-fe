@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 interface Product {
   id?: string;
   delivery?: string;
@@ -16,15 +14,12 @@ type SearchResults = Product[];
 export const handleSearch = async (
   searchQuery: string,
   setResults: (results: SearchResults) => void,
-  addProductsToDatabase: (
-    products: SearchResults,
-    img_url: string
-  ) => Promise<void>,
   resetForm: () => void,
   setIsLoading: (isLoading: boolean) => void
 ): Promise<{
   search_id?: string;
   imgURL?: string;
+  results: SearchResults;
 } | null> => {
   try {
     setIsLoading(true);
@@ -42,19 +37,10 @@ export const handleSearch = async (
 
     if (!response.ok) throw new Error("Status code: " + response.status);
 
-    const { data, imgURL } = await response.json();
+    const { results, imgURL, search_id } = await response.json();
     console.log(imgURL);
-    // Add unique IDs to each product
-    const productsWithIds = data.results.map((product: Product) => ({
-      ...product,
-      id: uuidv4(),
-    }));
 
-    setResults(productsWithIds);
-
-    // Add the results to the database
-    const search_id =
-      (await addProductsToDatabase(productsWithIds, imgURL)) ?? "";
+    setResults(results);
 
     resetForm();
     setIsLoading(false);
@@ -63,38 +49,11 @@ export const handleSearch = async (
       return null;
     }
 
-    return { search_id, imgURL };
+    return { search_id, imgURL, results };
   } catch (error) {
     console.error("Search failed:", error);
     setIsLoading(false);
     return null;
-  }
-};
-
-export const addProductsToDatabase = async (
-  products: SearchResults,
-  img_url: string
-) => {
-  try {
-    console.log("Adding products to database:", products);
-    const response = await fetch("/api/postProductDetails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ products, img_url }),
-    });
-
-    const data = await response.json();
-    const search_id = data.searchId;
-    if (response.ok) {
-      console.log("Products added successfully:", data.message);
-      return search_id;
-    } else {
-      console.error("Error adding products:", data.error);
-    }
-  } catch (error) {
-    console.error("Error adding products:", error);
   }
 };
 
