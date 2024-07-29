@@ -15,11 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { uploadFiles } from "@/actions/uploadThing";
-import {
-  handleSearch,
-  addProductsToDatabase,
-  isValidUrl,
-} from "@/utils/searchHandler";
+import { handleSearch, isValidUrl } from "@/utils/searchHandler";
 import { useRouter } from "next/navigation";
 
 interface SearchWithDropzoneProps {
