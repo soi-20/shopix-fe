@@ -135,7 +135,6 @@ export const SearchWithDropzone = ({
         const searchResponse = await handleSearch(
           searchQuery,
           setResults,
-          addProductsToDatabase,
           form.reset,
           setIsLoading
         );
@@ -148,9 +147,13 @@ export const SearchWithDropzone = ({
           return;
         }
 
-        const { search_id, imgURL } = searchResponse;
+        const { search_id, imgURL, results } = searchResponse;
 
         localStorage.setItem(`image_url_${search_id}`, imgURL ?? "");
+        localStorage.setItem(
+          `search_results_${search_id}`,
+          JSON.stringify(results)
+        );
 
         setIsLoading(false);
         router.push(`/search/${search_id}`);
