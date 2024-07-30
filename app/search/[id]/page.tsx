@@ -5,29 +5,17 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import ProductCard from "@/components/product-card/product-card";
 import SkeletonInstaCard from "@/components/skeleton/skeletonInstaCard";
-import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 import { SearchWithIcon } from "@/components/search/search";
-import { useSearchStore } from "@/store/searchResults";
+import { useSession } from "next-auth/react";
 
 const Searches = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | undefined>(undefined);
   const { id } = useParams<{ id: string }>();
+  const session = useSession();
+  const userId = session?.data?.user?.id;
   // const searchResults = useSearchStore((state) => state.results);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { isAuthenticated, session } = await checkIsAuthenticated();
-      if (isAuthenticated) {
-        setUserId(session?.user?.id);
-        console.log("User ID set in search/id:", session?.user?.id);
-      }
-    };
-
-    fetchSession();
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
