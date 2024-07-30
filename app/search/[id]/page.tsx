@@ -5,56 +5,37 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import ProductCard from "@/components/product-card/product-card";
 import SkeletonInstaCard from "@/components/skeleton/skeletonInstaCard";
-import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 import { SearchWithIcon } from "@/components/search/search";
-import { useSearchStore } from "@/store/searchResults";
+import { useSession } from "next-auth/react";
 
 const Searches = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | undefined>(undefined);
   const { id } = useParams<{ id: string }>();
+  const session = useSession();
+  const userId = session?.data?.user?.id;
   // const searchResults = useSearchStore((state) => state.results);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { isAuthenticated, session } = await checkIsAuthenticated();
-      if (isAuthenticated) {
-        setUserId(session?.user?.id);
-        console.log("User ID set in search/id:", session?.user?.id);
-      }
-    };
-
-    fetchSession();
-  }, []);
-
-  // TODO : If user not authenticated, then show both image and results for the current search
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const responseCached = localStorage.getItem(`searchResults_${id}`);
+        const imageCached = localStorage.getItem(`image_url_${id}`);
+        if (responseCached) {
+          setResults(JSON.parse(responseCached));
+          setImageUrl(imageCached);
+          setLoading(false);
+          return;
+        }
+
         const response = await fetch(`/api/getSearchResult/${id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch search results");
         }
         const data = await response.json();
         setResults(data.data.results);
-
-        if (data?.data?.image_url) {
-          setImageUrl(data.data.image_url);
-        } else {
-          console.log("Backend did not send imgURL, searching cache. ", {
-            searchId: id,
-          });
-          const imageUrlCached = localStorage.getItem(`image_url_${id}`);
-          if (imageUrlCached) {
-            setImageUrl(imageUrlCached);
-          } else {
-            console.log("No image found in cache", { searchId: id });
-          }
-        }
-
+        setImageUrl(data.data.image_url);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);

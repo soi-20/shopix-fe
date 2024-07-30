@@ -3,6 +3,7 @@ import "./globals.css";
 import { Poppins } from "next/font/google";
 import ThemeWrapper from "../lib/ThemeWrapper";
 import Script from "next/script";
+import { Providers } from "./provider";
 
 const poppins = Poppins({
   weight: ["400", "700"], // Specify the weights you need
@@ -49,7 +50,7 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           ></iframe>
         </noscript>
-        <ThemeWrapper>{children}</ThemeWrapper>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { searchSchema } from "@/lib/validation";
+import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const { isAuthenticated, session } = await checkIsAuthenticated();
+    let userId = null;
+    if (isAuthenticated) {
+      userId = session?.user?.id;
+    }
 
     const result = searchSchema.safeParse(body);
 
@@ -22,7 +28,8 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       cache: "no-store",
-      body: JSON.stringify({ imgURL }),
+      // pass both imgURL and userId
+      body: JSON.stringify({ imgURL, userId: userId }),
     });
 
     if (!response.ok) {
@@ -30,10 +37,10 @@ export async function POST(req: Request) {
     }
 
     const data = await response.json();
-    console.log(data);
+    const results = data.results;
+    const search_id = data.search_id;
 
-    // return both data and image url
-    return NextResponse.json({ data, imgURL });
+    return NextResponse.json({ results, imgURL, search_id });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

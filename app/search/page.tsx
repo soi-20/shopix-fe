@@ -4,24 +4,12 @@ import React from "react";
 import ProductCard from "@/components/product-card/product-card";
 import { SearchWithIcon } from "@/components/search/search";
 import { useSearchStore } from "@/store/searchResults";
-import { useEffect, useState } from "react";
-import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
+import { useSession } from "next-auth/react";
 
 const SearchPage = () => {
   const results = useSearchStore((state) => state.results);
-
-  const [userId, setUserId] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { isAuthenticated, session } = await checkIsAuthenticated();
-      if (isAuthenticated) {
-        setUserId(session?.user?.id);
-      }
-    };
-
-    fetchSession();
-  }, []);
+  const session = useSession();
+  const userId = session.data?.user?.id;
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
