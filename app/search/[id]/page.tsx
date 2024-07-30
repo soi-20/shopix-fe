@@ -83,14 +83,6 @@ const Searches = () => {
                 userId={userId}
               />
             ))}
-            {results.map((card, index) => (
-              <ProductCard
-                key={index}
-                className="w-full cursor-pointer"
-                cardData={card}
-                userId={userId}
-              />
-            ))}
           </div>
         </div>
       )}
