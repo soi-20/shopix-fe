@@ -5,27 +5,18 @@ import React, { useEffect, useState, useRef } from "react";
 import { ThemeToggle } from "../theme-toggle/theme-toggle";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
 import { handleSignOut as signOutAction } from "@/lib/auth/signoutServerAction";
 import { PiShoppingCart } from "react-icons/pi";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [image, setImage] = useState<any>(null);
+  const { data: session, status } = useSession();
+  const image = session?.user?.image ?? "";
+  const isAuthenticated = status === "authenticated";
   const [showPopover, setShowPopover] = useState(false);
   const router = useRouter();
   const popoverRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { isAuthenticated, session } = await checkIsAuthenticated();
-      setIsAuthenticated(isAuthenticated);
-      setImage(session?.user?.image);
-    };
-
-    checkAuth();
-  }, []);
 
   const handleSignIn = () => {
     router.push("/auth/sign-in");
@@ -58,7 +49,7 @@ const Navbar = () => {
     };
   }, [showPopover]);
 
-  if (isAuthenticated === null) {
+  if (status === "loading") {
     return (
       <div className="flex justify-between items-center p-4">
         <Link href="/">
