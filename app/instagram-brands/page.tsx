@@ -21,7 +21,7 @@ const BrandSuggestions: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/scrape-brand-suggestions",
+        "https://shoppin-tech.azurewebsites.net/scrape-brand-suggestions",
         {
           method: "POST",
           headers: {
