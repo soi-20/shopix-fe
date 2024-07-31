@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "circular";
+  src: url("../public/assets/circular/CircularStd-Light.otf")
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -70,6 +75,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -82,4 +88,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: normal;
+}
+
+.font-circular {
+  font-family: "circular", sans-serif;
+  /* Apply in class */
 }

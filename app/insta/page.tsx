@@ -85,8 +85,11 @@ const InstaPosts = () => {
         alt="logo"
         width={90}
         height={90}
-        className="mx-auto mb-8 object-contain rounded-full w-70 h-70 sm:w-90 sm:h-90"
+        className="mx-auto mb-1 object-contain rounded-full w-70 h-70 sm:w-90 sm:h-90"
       />
+      <p className="text-center text-2xl font-semibold text-black mb-8 font-circular">
+        shoppin&apos;
+      </p>
 
       {loading ? (
         <div className="flex justify-center items-center h-64 mt-20">
